@@ -8,12 +8,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
-public class AuthService {
+public class RegisterService {
 
-    private final UserRepository userRepository;
+    private final RegisterUserRepository registeruserRepository;
 
-    public AuthService(UserRepository userRepository) {
-        this.userRepository = userRepository;
+    public RegisterService(RegisterUserRepository registeruserRepository) {
+        this.registeruserRepository = registeruserRepository;
     }
 
     @Transactional
@@ -21,7 +21,7 @@ public class AuthService {
 
         String email = request.email().trim().toLowerCase();
 
-        if (userRepository.existsByEmail(email)) {
+        if (registeruserRepository.existsByEmail(email)) {
             throw new IllegalArgumentException(
                     "Email đã tồn tại"
             );
@@ -35,7 +35,7 @@ public class AuthService {
 
         user.setRole("USER");
 
-        User savedUser = userRepository.save(user);
+        User savedUser = registeruserRepository.save(user);
 
         return new RegisterResponse(
                 savedUser.getId(),
