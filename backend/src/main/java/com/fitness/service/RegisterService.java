@@ -1,9 +1,11 @@
 package com.fitness.service;
 
-import com.example.demo.dto.RegisterResponse;
-import com.example.demo.dto.RegisterRequest;
-import com.example.demo.model.User;
-import com.example.demo.repository.UserRepository;
+import com.fitness.dto.RegisterResponse;
+import com.fitness.dto.RegisterRequest;
+import com.fitness.model.User;
+import com.fitness.repository.RegisterUserRepository;
+
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -11,9 +13,11 @@ import org.springframework.transaction.annotation.Transactional;
 public class RegisterService {
 
     private final RegisterUserRepository registeruserRepository;
+    private final PasswordEncoder passwordEncoder;
 
     public RegisterService(RegisterUserRepository registeruserRepository) {
         this.registeruserRepository = registeruserRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @Transactional
@@ -31,7 +35,7 @@ public class RegisterService {
         user.setFullName(request.fullName().trim());
         user.setEmail(email);
 
-        user.setPassword(request.password());
+         user.setPassword(passwordEncoder.encode(request.password()));
 
         user.setRole("USER");
 
@@ -41,7 +45,6 @@ public class RegisterService {
                 savedUser.getId(),
                 savedUser.getFullName(),
                 savedUser.getEmail(),
-                savedUser.getPassword(),
                 savedUser.getRole()
         );
     }

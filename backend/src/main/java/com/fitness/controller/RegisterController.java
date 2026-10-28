@@ -1,7 +1,7 @@
-package com.example.demo.controller;
-import com.example.demo.dto.RegisterRequest;
-import com.example.demo.dto.RegisterResponse;
-import com.example.demo.service.RegisterService;
+package com.fitness.controller;
+import com.fitness.dto.RegisterRequest;
+import com.fitness.dto.RegisterResponse;
+import com.fitness.service.RegisterService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
