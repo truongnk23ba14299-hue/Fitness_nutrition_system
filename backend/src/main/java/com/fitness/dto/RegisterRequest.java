@@ -1,19 +1,15 @@
 package com.fitness.dto;
 
 import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
-
 public record RegisterRequest(
-        @NotNull(message = "Name không được để trống")
+        @NotBlank(message = "Họ và tên không được để trống")
         String fullName,
-
-        @NotNull(message = "Email không được để trống")
-        @Email(message = "Sai định dạng email")
+        @NotBlank(message = "Email không được để trống")
+        @Email(message = "Email không đúng định dạng")
         String email,
-
-        @NotNull(message = "Password không được để trống")
-        @Size(min = 8,message = "Password tối thiểu 8 kí tự")
+        @NotBlank(message = "Mật khẩu không được để trống")
+        @Size(min = 6, message = "Mật khẩu tối thiểu 6 ký tự")
         String password
-) {
-}
+) {}
