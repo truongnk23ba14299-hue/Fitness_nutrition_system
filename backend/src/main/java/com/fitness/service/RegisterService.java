@@ -10,42 +10,30 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
+@RequiredArgsConstructor
 public class RegisterService {
-
-    private final RegisterUserRepository registeruserRepository;
+    private final RegisterUserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
-
-    public RegisterService(RegisterUserRepository registeruserRepository) {
-        this.registeruserRepository = registeruserRepository;
-        this.passwordEncoder = passwordEncoder;
-    }
-
     @Transactional
     public RegisterResponse register(RegisterRequest request) {
-
         String email = request.email().trim().toLowerCase();
-
-        if (registeruserRepository.existsByEmail(email)) {
-            throw new IllegalArgumentException(
-                    "Email đã tồn tại"
-            );
+        if (userRepository.existsByEmail(email)) {
+            throw new IllegalArgumentException("Email này đã được sử dụng!");
         }
-
-        User user = new User();
-        user.setFullName(request.fullName().trim());
-        user.setEmail(email);
-
-         user.setPassword(passwordEncoder.encode(request.password()));
-
-        user.setRole("USER");
-
-        User savedUser = registeruserRepository.save(user);
-
+        // Dùng Builder của Lombok để tạo đối tượng siêu gọn
+        User user = User.builder()
+                .fullName(request.fullName().trim())
+                .email(email)
+                .password(passwordEncoder.encode(request.password()))
+                .role("ROLE_CLIENT")
+                .build();
+        User savedUser = userRepository.save(user);
         return new RegisterResponse(
                 savedUser.getId(),
                 savedUser.getFullName(),
                 savedUser.getEmail(),
-                savedUser.getRole()
+                savedUser.getRole(),
+                savedUser.getCreatedAt()
         );
     }
 }

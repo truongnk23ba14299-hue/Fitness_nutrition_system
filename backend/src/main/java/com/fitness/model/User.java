@@ -1,28 +1,45 @@
 package com.fitness.model;
 
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
-
+import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
+import java.time.LocalDateTime;
 @Entity
 @Table(name = "users")
 @Getter
 @Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class User {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false, length = 100)
+    @Column(name = "full_name", nullable = false, length = 100)
     private String fullName;
 
-    @Column(nullable = false, unique = true)
+    @Column(nullable = false, unique = true, length = 150)
     private String email;
 
-    @Column(nullable = false)
+    @Column(name = "password_hash", nullable = false)
     private String password;
 
-    @Column(nullable = false)
+    @Column(nullable = false, length = 50)
     private String role;
+    private String phone;
+    private String address;
+
+    @Column(name = "height_cm")
+    private Double heightCm;
+
+    @Column(name = "weight_kg")
+    private Double weightKg;
+
+    @Column(name = "avatar_url")
+    private String avatarUrl;
+    
+    @CreationTimestamp
+    @Column(name = "created_at", updatable = false)
+    private LocalDateTime createdAt;
 }
