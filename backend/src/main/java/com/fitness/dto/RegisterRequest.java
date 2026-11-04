@@ -14,5 +14,8 @@ public record RegisterRequest(
 
         @NotBlank(message = "Mật khẩu không được để trống")
         @Size(min = 6, message = "Mật khẩu tối thiểu 6 ký tự")
-        String password
+        String password,
+
+        @NotBlank(message = "Vui lòng xác nhận lại mật khẩu")
+        String confirmPassword
 ) {}
