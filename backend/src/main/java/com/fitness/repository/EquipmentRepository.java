@@ -1,4 +1,4 @@
-package main.java.com.fitness.repository;
+package com.fitness.repository;
 
 import com.example.demo.model.Equipments;
 import org.springframework.data.jpa.repository.JpaRepository;
