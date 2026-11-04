@@ -29,6 +29,7 @@ public class SecurityConfig {
                         // Cho phép gọi API đăng ký tự do mà không cần Token
                         .requestMatchers(HttpMethod.POST, "/api/auth/register").permitAll()
                         .requestMatchers("/api/auth/**").permitAll()
+                        .requestMatchers("/api/trainers/**").permitAll()
                         
                         // Tạm thời mở các API khác để nhóm bạn test tiện lợi
                         .anyRequest().permitAll()
