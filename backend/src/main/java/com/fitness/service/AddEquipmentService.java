@@ -1,19 +1,17 @@
 package com.fitness.service;
-import com.fitness.dto.*;
-import com.fitness.repository.EquipmentRepository;
-import com.fitness.model.Equipments;
 
-import org.jspecify.annotations.NonNull;
+import com.fitness.dto.AddEquipmentRequest;
+import com.fitness.dto.EquipmentResponse;
+import com.fitness.model.Equipments;
+import com.fitness.repository.EquipmentRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 
-
 @Service
 public class AddEquipmentService {
-    private final EquipmentRepository equipmentRepository ;
-
+    private final EquipmentRepository equipmentRepository;
 
     public AddEquipmentService(EquipmentRepository equipmentRepository) {
         this.equipmentRepository = equipmentRepository;
@@ -31,35 +29,31 @@ public class AddEquipmentService {
 
         if (req.price() == null || req.price().compareTo(BigDecimal.ZERO) < 0) {
             throw new IllegalArgumentException("Price must be >= 0");
-
         }
 
         if (req.stockQuantity() == null || req.stockQuantity() < 0) {
             throw new IllegalArgumentException("Stock quantity must be >= 0");
-
         }
 
         if (req.weightKg() != null && req.weightKg().compareTo(BigDecimal.ZERO) <= 0) {
             throw new IllegalArgumentException("Weight must be > 0");
-
         }
 
         Equipments equipment = createEquipment(req);
-        Equipments save_newEquipment = equipmentRepository.save(equipment);
+        Equipments saveNewEquipment = equipmentRepository.save(equipment);
 
         return new EquipmentResponse(
-                save_newEquipment.getId(),
-                save_newEquipment.getName(),
-                save_newEquipment.getDescription(),
-                save_newEquipment.getBrand(),
-                save_newEquipment.getPrice(),
-                save_newEquipment.getStockQty(),
-                save_newEquipment.getWeightKg()
-
+                saveNewEquipment.getId(),
+                saveNewEquipment.getName(),
+                saveNewEquipment.getDescription(),
+                saveNewEquipment.getBrand(),
+                saveNewEquipment.getPrice(),
+                saveNewEquipment.getStockQty(),
+                saveNewEquipment.getWeightKg()
         );
     }
 
-    private static @NonNull Equipments createEquipment(AddEquipmentRequest req) {
+    private static Equipments createEquipment(AddEquipmentRequest req) {
         Equipments equipment = new Equipments();
         equipment.setName(req.name().trim());
         equipment.setDescription(req.description());
