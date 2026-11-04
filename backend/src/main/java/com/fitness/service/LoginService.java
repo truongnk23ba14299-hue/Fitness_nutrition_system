@@ -7,12 +7,17 @@ import com.fitness.dto.UserResponse;
 import com.fitness.model.User;
 import com.fitness.repository.LoginAccountRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
 
 @Service
 @RequiredArgsConstructor
@@ -24,10 +29,17 @@ public class LoginService {
 
     // 1. Xử lý Đăng Nhập
     public LoginResponse login(LoginRequest request) {
-        // Kiểm tra email và password qua Spring Security
-        Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword())
-        );
+        Authentication authentication;
+        try {
+            // Kiểm tra email và password qua Spring Security (BCrypt)
+            authentication = authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword())
+            );
+        } catch (BadCredentialsException | UsernameNotFoundException e) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Email hoặc mật khẩu không chính xác");
+        } catch (AuthenticationException e) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Đăng nhập thất bại: " + e.getMessage());
+        }
 
         // Lưu phiên đăng nhập
         SecurityContextHolder.getContext().setAuthentication(authentication);
@@ -45,7 +57,7 @@ public class LoginService {
     @Transactional(readOnly = true)
     public UserResponse getCurrentUser(String email) {
         User user = loginAccountRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("Không tìm thấy người dùng: " + email));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Không tìm thấy người dùng: " + email));
 
         return UserResponse.fromEntity(user);
     }
