@@ -1,8 +1,8 @@
-package main.java.com.fitness.service;
-import main.java.com.fitness.dto.EquipmentResponse;
-import main.java.com.fitness.dto.EquipmentDetailResponse;
-import main.java.com.fitness.model.Equipments;
-import main.java.com.fitness.repository.EquipmentRepository;
+package com.fitness.service;
+import com.fitness.dto.EquipmentResponse;
+import com.fitness.dto.EquipmentDetailResponse;
+import com.fitness.model.Equipments;
+import com.fitness.repository.EquipmentRepository;
 
 import org.springframework.stereotype.Service;
 
