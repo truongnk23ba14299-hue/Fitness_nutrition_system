@@ -25,7 +25,7 @@ public class SecurityConfig {
         return new BCryptPasswordEncoder();
     }
 
-    // 2. Cung cấp UserDetailsService để tìm kiếm user trong database theo email
+    // 2. Cung cấp UserDetailsService để tìm kiếm user trong database theo Email
     @Bean
     public UserDetailsService userDetailsService(RegisterUserRepository userRepository) {
         return username -> userRepository.findByEmail(username)
