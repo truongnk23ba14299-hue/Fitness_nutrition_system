@@ -4,7 +4,7 @@ import com.fitness.dto.RegisterResponse;
 import com.fitness.dto.RegisterRequest;
 import com.fitness.model.User;
 import com.fitness.repository.RegisterUserRepository;
-
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
