@@ -1,7 +1,7 @@
-package main.java.com.fitness.controller;
-import main.java.com.fitness.dto.EquiqmentResponse;
-import main.java.com.fitness.dto.EquiqmentDetailResponse;
-import main.java.com.fitness.Service.EquiqmentService;
+package com.fitness.controller;
+import com.fitness.dto.EquiqmentResponse;
+import com.fitness.dto.EquiqmentDetailResponse;
+import com.fitness.Service.EquiqmentService;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
