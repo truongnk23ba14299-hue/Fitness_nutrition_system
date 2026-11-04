@@ -1,4 +1,4 @@
-package main.java.com.fitness.model;
+package com.fitness.model;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
