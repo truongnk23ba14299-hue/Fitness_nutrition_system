@@ -17,6 +17,11 @@ public class RegisterService {
 
     @Transactional
     public RegisterResponse register(RegisterRequest request) {
+        
+        if (!request.password().equals(request.confirmPassword())) {
+            throw new IllegalArgumentException("Mật khẩu xác nhận không khớp!");
+        }
+
         String email = request.email().trim().toLowerCase();
         if (userRepository.existsByEmail(email)) {
             throw new IllegalArgumentException("Email này đã được sử dụng!");
