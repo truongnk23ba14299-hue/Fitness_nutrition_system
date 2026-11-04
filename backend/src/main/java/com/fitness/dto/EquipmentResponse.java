@@ -1,6 +1,6 @@
-package main.java.com.fitness.dto;
+package com.fitness.dto;
 
-import main.java.com.fitness.model.Equipments;
+import com.fitness.model.Equipments;
 
 import java.math.BigDecimal;
 
