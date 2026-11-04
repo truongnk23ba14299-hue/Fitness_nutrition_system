@@ -49,7 +49,7 @@ public class JwtTokenProvider {
                 .getSubject();
     }
 
-    // 3. Kiểm tra tính hợp lệ của Token
+    // 3. Kiểm tra tính hợp lệ của TOKEN
     public boolean validateToken(String token) {
         try {
             Jwts.parser()
