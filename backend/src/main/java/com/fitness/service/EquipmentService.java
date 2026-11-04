@@ -1,9 +1,9 @@
 package com.fitness.service;
-
-import com.fitness.dto.EquipmentDetailResponse;
 import com.fitness.dto.EquipmentResponse;
+import com.fitness.dto.EquipmentDetailResponse;
 import com.fitness.model.Equipments;
 import com.fitness.repository.EquipmentRepository;
+
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -16,15 +16,15 @@ public class EquipmentService {
         this.equipmentRepository = equipmentRepository;
     }
 
-    public List<EquipmentResponse> getAllEquipments() {
+    public List<EquipmentResponse> getAllEquipments(){
         List<Equipments> equipments = equipmentRepository.findAll();
         if (equipments.isEmpty()) {
-            return List.of();
+            throw new IllegalStateException("Không thể lấy danh sách");
         }
 
-        return equipments.stream()
-                .map(EquipmentResponse::fromEntity)
-                .toList();
+        return equipments.stream().map(EquipmentResponse::fromEntity).toList();
+
+
     }
 
     public EquipmentDetailResponse getEquipmentById(Long id) {
@@ -34,3 +34,6 @@ public class EquipmentService {
         return EquipmentDetailResponse.fromEntity(equipment);
     }
 }
+
+
+
