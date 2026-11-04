@@ -1,4 +1,4 @@
-package com.usth.fitness_project.model;
+package com.fitness.model;
 
 import jakarta.persistence.*;
 import lombok.*;

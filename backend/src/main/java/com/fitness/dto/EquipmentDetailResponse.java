@@ -1,6 +1,6 @@
-package main.java.com.fitness.dto;
+package com.fitness.dto;
 
-import main.java.com.fitness.model.Equipments;
+import com.fitness.model.Equipments;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -16,9 +16,7 @@ public record EquipmentDetailResponse(
         BigDecimal weightKg,
         LocalDateTime created_at,
         LocalDateTime updated_at
-
-
-){
+) {
     public static EquipmentDetailResponse fromEntity(Equipments equipment) {
         if (equipment == null) {
             throw new IllegalStateException("Dụng cụ ko đc null");
@@ -32,9 +30,9 @@ public record EquipmentDetailResponse(
                 || equipment.getPrice() == null
                 || equipment.getPrice().signum() < 0
                 || equipment.getStockQty() == null
-                || equipment.getStockQty() < 0 ){
+                || equipment.getStockQty() < 0) {
 
-            throw new IllegalStateException("Dụng cụ với id ko hợp lệ: " +equipment.getId());
+            throw new IllegalStateException("Dụng cụ với id ko hợp lệ: " + equipment.getId());
         }
 
         return new EquipmentDetailResponse(
@@ -48,9 +46,6 @@ public record EquipmentDetailResponse(
                 equipment.getWeightKg(),
                 equipment.getCreatedAt(),
                 equipment.getUpdatedAt()
-
         );
     }
 }
-
-

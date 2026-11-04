@@ -1,7 +1,7 @@
 package com.fitness.service;
 
 import com.fitness.dto.PackageDetailResponse;
-import com.fitness.repository.PackageDetailRepository;
+import com.fitness.repository.PackageRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -9,9 +9,9 @@ import org.springframework.web.server.ResponseStatusException;
 @Service
 public class PackageDetailService {
 
-    private final PackageDetailRepository repository;
+    private final PackageRepository repository;
 
-    public PackageDetailService(PackageDetailRepository repository) {
+    public PackageDetailService(PackageRepository repository) {
         this.repository = repository;
     }
 
@@ -20,7 +20,7 @@ public class PackageDetailService {
                 .map(PackageDetailResponse::fromEntity)
                 .orElseThrow(() -> new ResponseStatusException(
                         HttpStatus.NOT_FOUND,
-                        "Package not found with ID: " + id
+                        "Không tìm thấy gói tập với ID: " + id
                 ));
     }
 }

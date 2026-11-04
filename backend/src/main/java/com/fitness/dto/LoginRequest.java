@@ -1,4 +1,4 @@
-package com.usth.fitness_project.dto;
+package com.fitness.dto;
 
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;

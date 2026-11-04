@@ -1,7 +1,13 @@
 package com.fitness.dto;
 
-import com.fitness.model.PackageDetail;
+import com.fitness.model.WorkoutPackage;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class PackageDetailResponse {
 
     private Long id;
@@ -9,36 +15,13 @@ public class PackageDetailResponse {
     private String schedule;
     private String trainerInfo;
 
-    public PackageDetailResponse(Long id, String benefits,
-                                  String schedule, String trainerInfo) {
-        this.id = id;
-        this.benefits = benefits;
-        this.schedule = schedule;
-        this.trainerInfo = trainerInfo;
-    }
-
-    public static PackageDetailResponse fromEntity(PackageDetail detail) {
+    public static PackageDetailResponse fromEntity(WorkoutPackage pkg) {
+        if (pkg == null) return null;
         return new PackageDetailResponse(
-                detail.getId(),
-                detail.getBenefits(),
-                detail.getSchedule(),
-                detail.getTrainerInfo()
+                pkg.getId(),
+                pkg.getBenefits(),
+                pkg.getScheduleDetails(),
+                pkg.getTrainerInfo()
         );
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public String getBenefits() {
-        return benefits;
-    }
-
-    public String getSchedule() {
-        return schedule;
-    }
-
-    public String getTrainerInfo() {
-        return trainerInfo;
     }
 }

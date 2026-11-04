@@ -1,8 +1,8 @@
-package com.example.demo.service;
+package com.fitness.service;
 
-import com.example.demo.dto.PackageResponse;
-import com.example.demo.model.WorkoutPackage;
-import com.example.demo.repository.PackageRepository;
+import com.fitness.dto.PackageResponse;
+import com.fitness.model.WorkoutPackage;
+import com.fitness.repository.PackageRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -18,7 +18,6 @@ public class PackageService {
     public List<PackageResponse> getAllActivePackages() {
         List<WorkoutPackage> packages = packageRepository.findByIsActiveTrue();
 
-        // turn to DTO
         return packages.stream().map(pkg -> new PackageResponse(
                 pkg.getId(),
                 pkg.getTitle(),

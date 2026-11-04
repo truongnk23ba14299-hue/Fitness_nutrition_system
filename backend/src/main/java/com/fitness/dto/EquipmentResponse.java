@@ -1,6 +1,6 @@
-package main.java.com.fitness.dto;
+package com.fitness.dto;
 
-import main.java.com.fitness.model.Equipments;
+import com.fitness.model.Equipments;
 
 import java.math.BigDecimal;
 
@@ -12,8 +12,8 @@ public record EquipmentResponse(
         BigDecimal price,
         Integer stockQuantity,
         BigDecimal weightKg
-){
-    public static EquipmentResponse fromEntity(Equipments e){
+) {
+    public static EquipmentResponse fromEntity(Equipments e) {
         return new EquipmentResponse(
                 e.getId(),
                 e.getName(),
@@ -22,16 +22,6 @@ public record EquipmentResponse(
                 e.getPrice(),
                 e.getStockQty(),
                 e.getWeightKg()
-
         );
     }
 }
-
-
-
-
-
-
-
-
-

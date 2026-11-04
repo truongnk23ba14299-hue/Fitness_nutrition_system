@@ -17,8 +17,7 @@ public class PackageDetailController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<PackageDetailResponse> getPackageDetail(
-            @PathVariable Long id) {
+    public ResponseEntity<PackageDetailResponse> getPackageDetail(@PathVariable Long id) {
         return ResponseEntity.ok(service.getPackageDetailById(id));
     }
 }

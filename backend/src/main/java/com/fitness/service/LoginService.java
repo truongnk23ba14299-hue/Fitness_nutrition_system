@@ -1,11 +1,11 @@
-package com.usth.fitness_project.service;
+package com.fitness.service;
 
-import com.usth.fitness_project.config.JwtTokenProvider;
-import com.usth.fitness_project.dto.LoginRequest;
-import com.usth.fitness_project.dto.LoginResponse;
-import com.usth.fitness_project.dto.UserResponse;
-import com.usth.fitness_project.model.Account;
-import com.usth.fitness_project.repository.LoginAccountRepository;
+import com.fitness.config.JwtTokenProvider;
+import com.fitness.dto.LoginRequest;
+import com.fitness.dto.LoginResponse;
+import com.fitness.dto.UserResponse;
+import com.fitness.model.User;
+import com.fitness.repository.LoginAccountRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -35,18 +35,18 @@ public class LoginService {
         // Sinh JWT token
         String jwt = jwtTokenProvider.generateToken(authentication);
 
-        // Lấy thông tin account vừa đăng nhập
-        Account account = (Account) authentication.getPrincipal();
+        // Lấy thông tin user vừa đăng nhập
+        User user = (User) authentication.getPrincipal();
 
-        return new LoginResponse(jwt, "Bearer", UserResponse.fromEntity(account));
+        return new LoginResponse(jwt, "Bearer", UserResponse.fromEntity(user));
     }
 
     // 2. Lấy thông tin tài khoản hiện tại từ email
     @Transactional(readOnly = true)
     public UserResponse getCurrentUser(String email) {
-        Account account = loginAccountRepository.findByEmail(email)
+        User user = loginAccountRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy người dùng: " + email));
 
-        return UserResponse.fromEntity(account);
+        return UserResponse.fromEntity(user);
     }
 }

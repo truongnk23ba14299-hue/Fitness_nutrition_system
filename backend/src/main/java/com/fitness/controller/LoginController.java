@@ -1,9 +1,9 @@
-package com.usth.fitness_project.controller;
+package com.fitness.controller;
 
-import com.usth.fitness_project.dto.LoginRequest;
-import com.usth.fitness_project.dto.LoginResponse;
-import com.usth.fitness_project.dto.UserResponse;
-import com.usth.fitness_project.service.LoginService;
+import com.fitness.dto.LoginRequest;
+import com.fitness.dto.LoginResponse;
+import com.fitness.dto.UserResponse;
+import com.fitness.service.LoginService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -29,6 +29,9 @@ public class LoginController {
     // 2. API Xem thông tin cá nhân: GET /api/auth/me
     @GetMapping("/me")
     public ResponseEntity<UserResponse> getCurrentUser(@AuthenticationPrincipal UserDetails userDetails) {
+        if (userDetails == null) {
+            return ResponseEntity.status(401).build();
+        }
         UserResponse response = loginService.getCurrentUser(userDetails.getUsername());
         return ResponseEntity.ok(response);
     }

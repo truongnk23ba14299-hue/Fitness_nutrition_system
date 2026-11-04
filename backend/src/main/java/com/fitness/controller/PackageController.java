@@ -1,9 +1,10 @@
-package com.example.demo.controller;
+package com.fitness.controller;
 
-import com.example.demo.dto.PackageResponse;
-import com.example.demo.service.PackageService;
+import com.fitness.dto.PackageResponse;
+import com.fitness.service.PackageService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -11,7 +12,8 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/packages") // Chuẩn RESTful theo yêu cầu nhóm: không có /v1/
+@RequestMapping("/api/packages")
+@CrossOrigin(origins = "*")
 public class PackageController {
 
     @Autowired

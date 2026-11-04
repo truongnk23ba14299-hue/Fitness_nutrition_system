@@ -14,6 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class RegisterService {
     private final RegisterUserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+
     @Transactional
     public RegisterResponse register(RegisterRequest request) {
         String email = request.email().trim().toLowerCase();

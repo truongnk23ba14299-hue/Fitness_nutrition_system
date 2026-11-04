@@ -1,7 +1,6 @@
-package com.usth.fitness_project.dto;
+package com.fitness.dto;
 
-import com.usth.fitness_project.model.Account;
-import com.usth.fitness_project.model.Role;
+import com.fitness.model.User;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -21,18 +20,18 @@ public class UserResponse {
     private String phone;
     private List<String> roles;
 
-    public static UserResponse fromEntity(Account account) {
-        if (account == null) return null;
+    public static UserResponse fromEntity(User user) {
+        if (user == null) return null;
 
-        List<String> roleNames = (account.getRoles() != null)
-                ? account.getRoles().stream().map(Role::getName).toList()
-                : List.of();
+        List<String> roleNames = (user.getRole() != null && !user.getRole().isBlank())
+                ? List.of(user.getRole())
+                : List.of("ROLE_CLIENT");
 
         return UserResponse.builder()
-                .id(account.getId())
-                .email(account.getEmail())
-                .fullName(account.getFullName())
-                .phone(account.getPhone())
+                .id(user.getId())
+                .email(user.getEmail())
+                .fullName(user.getFullName())
+                .phone(user.getPhone())
                 .roles(roleNames)
                 .build();
     }

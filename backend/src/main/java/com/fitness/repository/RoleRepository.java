@@ -1,6 +1,6 @@
-package com.usth.fitness_project.repository;
+package com.fitness.repository;
 
-import com.usth.fitness_project.model.Role;
+import com.fitness.model.Role;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
