@@ -1,6 +1,6 @@
 package com.fitness.config;
 
-import com.fitness.repository.RegisterUserRepository;
+import com.fitness.repository.UserRepository;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -30,7 +30,7 @@ public class SecurityConfig {
 
     // 2. Cung cấp UserDetailsService để tìm kiếm user trong database theo Email
     @Bean
-    public UserDetailsService userDetailsService(RegisterUserRepository userRepository) {
+    public UserDetailsService userDetailsService(UserRepository userRepository) {
         return username -> userRepository.findByEmail(username)
                 .orElseThrow(() -> new UsernameNotFoundException("Không tìm thấy người dùng với email: " + username));
     }

@@ -5,7 +5,7 @@ import com.fitness.dto.LoginRequest;
 import com.fitness.dto.LoginResponse;
 import com.fitness.dto.UserResponse;
 import com.fitness.model.User;
-import com.fitness.repository.LoginAccountRepository;
+import com.fitness.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -24,7 +24,7 @@ import org.springframework.web.server.ResponseStatusException;
 public class LoginService {
 
     private final AuthenticationManager authenticationManager;
-    private final LoginAccountRepository loginAccountRepository;
+    private final UserRepository userRepository;
     private final JwtTokenProvider jwtTokenProvider;
 
     // 1. Xử lý Đăng Nhập
@@ -56,7 +56,7 @@ public class LoginService {
     // 2. Lấy thông tin tài khoản hiện tại từ email
     @Transactional(readOnly = true)
     public UserResponse getCurrentUser(String email) {
-        User user = loginAccountRepository.findByEmail(email)
+        User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Không tìm thấy người dùng: " + email));
 
         return UserResponse.fromEntity(user);

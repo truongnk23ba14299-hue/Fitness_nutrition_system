@@ -3,7 +3,7 @@ package com.fitness.service;
 import com.fitness.dto.RegisterResponse;
 import com.fitness.dto.RegisterRequest;
 import com.fitness.model.User;
-import com.fitness.repository.RegisterUserRepository;
+import com.fitness.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -12,7 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @RequiredArgsConstructor
 public class RegisterService {
-    private final RegisterUserRepository userRepository;
+    private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
 
     @Transactional
