@@ -1,4 +1,4 @@
-@'
+
 package com.fitness.controller;
 
 import com.fitness.dto.PackageDetailResponse;
@@ -32,4 +32,3 @@ public class PackageController {
         return ResponseEntity.ok(packageDetailService.getPackageDetailById(id));
     }
 }
-'@ | Set-Content -Path "src\main\java\com\fitness\controller\PackageController.java" -Encoding UTF8
