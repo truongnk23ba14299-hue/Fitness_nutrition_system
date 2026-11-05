@@ -1,9 +1,10 @@
 package com.fitness.repository;
 
-import com.fitness.model.Equipments;
+import com.fitness.model.Products;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface EquipmentRepository extends JpaRepository<Equipments, Long> {
+public interface ProductRepository extends JpaRepository<Products, Long> {
+    
 }

@@ -4,7 +4,7 @@ import jakarta.validation.constraints.*;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
-public record AddEquipmentRequest(
+public record AddProductRequest(
 
         @NotBlank(message = "Name is required")
         String name,
@@ -33,4 +33,3 @@ public record AddEquipmentRequest(
         LocalDateTime updated_at
 
 ) {}
-

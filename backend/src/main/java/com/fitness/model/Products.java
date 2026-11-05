@@ -1,5 +1,7 @@
 package com.fitness.model;
 import jakarta.persistence.*;
+//import jakarta.validation.constraints.NotNull;
+//import jakarta.validation.constraints.PositiveOrZero;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -7,12 +9,12 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name= "equipments")
+@Table(name= "products")
 @Getter
 @Setter
 
 
-public class Equipments {
+public class Products {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -41,14 +43,13 @@ public class Equipments {
     @Column(name= "image_url")
     private String imageUrl;
 
-
     @Column(name= "created_at", insertable=false, updatable=false )
     private LocalDateTime createdAt;
 
     @Column(name= "updated_at", insertable=false, updatable=false  )
     private LocalDateTime updatedAt;
 
-    public Equipments(){ }
+    public Products(){ }
 
 
 }
