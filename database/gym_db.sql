@@ -77,4 +77,4 @@ INSERT INTO equipments (name, brand, image_url, workout_guide, target_muscle) VA
 3. Giữ lưng thẳng, siết chặt cơ bụng và từ từ đẩy hông ra sau hạ người xuống tư thế Squat đến khi đùi song song sàn. 
 4. Đạp mạnh chân đứng thẳng dậy, thở ra và xoay cổ tay khóa móc an toàn.',
     'Toàn thân & Cơ Đùi Mông (Legs & Glutes)'
-)
+)*/

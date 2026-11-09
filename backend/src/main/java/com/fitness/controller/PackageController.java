@@ -24,6 +24,7 @@ public class PackageController {
     @GetMapping
     public ResponseEntity<List<PackageResponse>> getAllPackages() {
         return ResponseEntity.ok(packageService.getAllActivePackages());
+
     }
 
     @GetMapping("/{id}")
