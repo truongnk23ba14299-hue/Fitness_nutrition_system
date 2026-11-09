@@ -1,13 +1,12 @@
 package com.fitness.controller;
 
+import com.fitness.dto.PackageDetailResponse;
 import com.fitness.dto.PackageResponse;
+import com.fitness.service.PackageDetailService;
 import com.fitness.service.PackageService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -19,9 +18,17 @@ public class PackageController {
     @Autowired
     private PackageService packageService;
 
+    @Autowired
+    private PackageDetailService packageDetailService;
+
     @GetMapping
-    public ResponseEntity<List<PackageResponse>> getPackages() {
-        List<PackageResponse> responseList = packageService.getAllActivePackages();
-        return ResponseEntity.ok(responseList);
+    public ResponseEntity<List<PackageResponse>> getAllPackages() {
+        return ResponseEntity.ok(packageService.getAllActivePackages());
+
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<PackageDetailResponse> getPackageDetail(@PathVariable Long id) {
+        return ResponseEntity.ok(packageDetailService.getPackageDetailById(id));
     }
 }

@@ -67,9 +67,12 @@ public class SecurityConfig {
                                 "/api/auth/login"
                         ).permitAll()
 
-                        // API xác thực và thông tin cá nhân
-                        .requestMatchers("/api/auth/me").authenticated()
+                        // Yêu cầu phải có Token hợp lệ khi xem thông tin cá nhân
+                        .requestMatchers("/api/users/**", "/api/auth/me").authenticated()
+
+                        // Mở các API public khác để phục vụ học viên/khách xem thông tin
                         .requestMatchers("/api/auth/**").permitAll()
+                        .requestMatchers("/api/trainers/**", "/api/packages/**", "/api/equipments/**", "/api/products/**").permitAll()
 
                         // Danh sách gói tập: Public Preview
                         .requestMatchers(
