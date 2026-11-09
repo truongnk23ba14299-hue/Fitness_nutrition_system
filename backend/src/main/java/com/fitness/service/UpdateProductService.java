@@ -1,6 +1,5 @@
 package com.fitness.service;
 import com.fitness.dto.AddProductRequest;
-import com.fitness.dto.ProductDetailResponse;
 import com.fitness.dto.ProductResponse;
 import com.fitness.model.Products;
 import com.fitness.repository.ProductRepository;

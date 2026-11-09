@@ -56,20 +56,46 @@ public class SecurityConfig {
 
                 // Cấu hình quyền truy cập các đường dẫn
                 .authorizeHttpRequests(auth -> auth
-                        // Cho phép Preflight request (OPTIONS) từ trình duyệt
+
+                        // Cho phép Preflight request
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
 
-                        // Cho phép gọi API đăng ký và đăng nhập tự do mà không cần Token
-                        .requestMatchers(HttpMethod.POST, "/api/auth/register", "/api/auth/login").permitAll()
+                        // Đăng ký tài khoản và đăng nhập không cần JWT
+                        .requestMatchers(
+                                HttpMethod.POST,
+                                "/api/auth/register",
+                                "/api/auth/login"
+                        ).permitAll()
 
-                        // Yêu cầu phải có Token hợp lệ khi xem thông tin cá nhân
+                        // API xác thực và thông tin cá nhân
                         .requestMatchers("/api/auth/me").authenticated()
-
-                        // Mở các API public khác để phục vụ học viên/khách xem thông tin
                         .requestMatchers("/api/auth/**").permitAll()
-                        .requestMatchers("/api/trainers/**", "/api/packages/**", "/api/equipments/**").permitAll()
 
-                        // Tạm thời cho phép các request khác để nhóm tiện phát triển
+                        // Danh sách gói tập: Public Preview
+                        .requestMatchers(
+                                HttpMethod.GET,
+                                "/api/packages"
+                        ).permitAll()
+
+                        // Chi tiết gói tập: Phải đăng nhập
+                        .requestMatchers(
+                                HttpMethod.GET,
+                                "/api/packages/{id}"
+                        ).authenticated()
+
+                        // Đăng ký mua gói tập: Phải đăng nhập
+                        .requestMatchers(
+                                HttpMethod.POST,
+                                "/api/package-enrollments"
+                        ).authenticated()
+
+                        // Các API trainers và equipments vẫn public
+                        .requestMatchers(
+                                "/api/trainers/**",
+                                "/api/equipments/**"
+                        ).permitAll()
+
+                        // Tạm thời giữ cấu hình cũ cho các API khác
                         .anyRequest().permitAll()
                 )
 
