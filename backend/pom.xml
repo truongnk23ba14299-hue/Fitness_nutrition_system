@@ -65,7 +65,8 @@
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
-            <optional>true</optional>
+            <version>1.18.32</version>
+            <scope>provided</scope>
         </dependency>
 
         <!-- 8. THƯ VIỆN JWT (Phục vụ Cao Tuấn làm API Login sinh Token xác thực) -->
@@ -98,7 +99,14 @@
             <artifactId>spring-security-test</artifactId>
             <scope>test</scope>
         </dependency>
+
+        <dependency>
+            <groupId>org.jspecify</groupId>
+            <artifactId>jspecify</artifactId>
+            <version>1.0.0</version>
+        </dependency>
     </dependencies>
+
 
     <build>
         <plugins>
