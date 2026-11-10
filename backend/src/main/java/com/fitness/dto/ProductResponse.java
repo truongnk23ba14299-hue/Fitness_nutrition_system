@@ -19,7 +19,7 @@ public record ProductResponse(
                 p.getDescription(),
                 p.getBrand(),
                 p.getPrice(),
-                p.getStockQty(),
+                p.getStockQuantity(),
                 p.getWeightKg()
         );
     }

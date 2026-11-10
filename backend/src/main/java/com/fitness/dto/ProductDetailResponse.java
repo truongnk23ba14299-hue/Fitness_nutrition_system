@@ -16,14 +16,11 @@ public record ProductDetailResponse(
         BigDecimal weightKg,
         LocalDateTime created_at,
         LocalDateTime updated_at
-
-
 ){
     public static ProductDetailResponse fromEntity(Products product) {
         if (product == null) {
             throw new IllegalStateException("Sản phẩm ko đc null");
         }
-
         if (product.getId() == null
             || product.getName() == null
             || product.getName().isBlank()
@@ -31,19 +28,18 @@ public record ProductDetailResponse(
             || product.getCategory().isBlank()
             || product.getPrice() == null
             || product.getPrice().signum() < 0
-            || product.getStockQty() == null
-            || product.getStockQty() < 0 ){
+            || product.getStockQuantity() == null
+            || product.getStockQuantity() < 0 ){
 
             throw new IllegalStateException("Sản phẩm với id ko hợp lệ: " +product.getId());
         }
-
         return new ProductDetailResponse(
                 product.getId(),
                 product.getName(),
                 product.getDescription(),
                 product.getBrand(),
                 product.getPrice(),
-                product.getStockQty(),
+                product.getStockQuantity(),
                 product.getImageUrl(),
                 product.getWeightKg(),
                 product.getCreatedAt(),
