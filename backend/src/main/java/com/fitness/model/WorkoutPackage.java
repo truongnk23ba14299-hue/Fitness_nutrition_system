@@ -1,5 +1,7 @@
 package com.fitness.model;
 
+import java.math.BigDecimal;
+
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -17,7 +19,8 @@ public class WorkoutPackage {
     private Long id;
 
     private String title;
-    private Double price;
+    @Column(name = "price", nullable = false, precision = 12, scale = 2)
+    private BigDecimal price;
 
     @Column(name = "duration_months")
     private Integer durationMonths;
