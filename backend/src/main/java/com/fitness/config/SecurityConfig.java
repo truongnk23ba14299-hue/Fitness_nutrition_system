@@ -91,6 +91,12 @@ public class SecurityConfig {
                                 HttpMethod.POST,
                                 "/api/package-enrollments"
                         ).authenticated()
+                        
+                        // Đặt lịch PT: Phải đăng nhập
+                        .requestMatchers(
+                        HttpMethod.POST,
+                         "/api/bookings/pt"
+                        ).authenticated()
 
                         // Các API trainers và equipments vẫn public
                         .requestMatchers(
