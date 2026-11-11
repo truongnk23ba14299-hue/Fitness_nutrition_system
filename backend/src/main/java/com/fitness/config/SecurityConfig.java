@@ -72,8 +72,8 @@ public class SecurityConfig {
 
                         // Mở các API public khác để phục vụ học viên/khách xem thông tin
                         .requestMatchers("/api/auth/**").permitAll()
-                        .requestMatchers("/api/trainers/**", "/api/packages/**", "/api/equipments/**", "/api/products/**").permitAll()
-
+                        .requestMatchers("/api/trainers/**", "/api/packages/**",  "/api/products/**").permitAll()
+                        
                         // Danh sách gói tập: Public Preview
                         .requestMatchers(
                                 HttpMethod.GET,
@@ -98,14 +98,19 @@ public class SecurityConfig {
                          "/api/bookings/pt"
                         ).authenticated()
 
-                        // Các API trainers và equipments vẫn public
-                        .requestMatchers(
-                                "/api/trainers/**",
-                                "/api/equipments/**"
-                        ).permitAll()
+                        //CHỈ ADMIN MỚI ĐƯỢC THÊM/SỬA/XÓA THIẾT BỊ
+                        .requestMatchers(HttpMethod.POST, "/api/equipments/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.PUT, "/api/equipments/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/api/equipments/**").hasRole("ADMIN")
 
-                        // Tạm thời giữ cấu hình cũ cho các API khác
-                        .anyRequest().permitAll()
+                        //XEM CHI TIẾT BÀI TẬP BẮT BUỘC PHẢI ĐĂNG NHẬP (Bảo vệ nội dung)
+                        .requestMatchers(HttpMethod.GET, "/api/equipments/{id}").authenticated()
+
+                        //Khách vãng lai chỉ được xem danh sách tóm tắt thiết bị
+                        .requestMatchers(HttpMethod.GET, "/api/equipments").permitAll()
+
+                        // Tất cả các request còn lại
+                        .anyRequest().authenticated()
                 )
 
                 // Đăng ký JWT Filter đứng trước UsernamePasswordAuthenticationFilter
