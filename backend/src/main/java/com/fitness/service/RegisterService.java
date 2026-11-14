@@ -33,7 +33,7 @@ public class RegisterService {
                 .fullName(request.fullName().trim())
                 .email(email)
                 .password(passwordEncoder.encode(request.password()))
-                .role("ROLE_USER") 
+                .role("ROLE_CLIENT") 
                 .build();
 
         User savedUser = userRepository.save(user);
