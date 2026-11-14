@@ -57,62 +57,32 @@ public class SecurityConfig {
                 // Cấu hình quyền truy cập các đường dẫn
                 .authorizeHttpRequests(auth -> auth
 
-                        // Cho phép Preflight request
+                        // 1. Preflight requests (CORS)
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-
-                        // Đăng ký tài khoản và đăng nhập không cần JWT
-                        .requestMatchers(
-                                HttpMethod.POST,
-                                "/api/auth/register",
-                                "/api/auth/login"
-                        ).permitAll()
-
-                        // Yêu cầu phải có Token hợp lệ khi xem thông tin cá nhân
-                        .requestMatchers("/api/users/**", "/api/auth/me").authenticated()
-
-                        // Mở các API public khác để phục vụ học viên/khách xem thông tin
-                        .requestMatchers("/api/auth/**").permitAll()
-                        .requestMatchers("/api/trainers/**", "/api/packages/**",  "/api/products/**").permitAll()
-                        
-                        // Danh sách gói tập: Public Preview
-                        .requestMatchers(
-                                HttpMethod.GET,
-                                "/api/packages"
-                        ).permitAll()
-
-                        // Chi tiết gói tập: Phải đăng nhập
-                        .requestMatchers(
-                                HttpMethod.GET,
-                                "/api/packages/{id}"
-                        ).authenticated()
-
-                        // Đăng ký mua gói tập: Phải đăng nhập
-                        .requestMatchers(
-                                HttpMethod.POST,
-                                "/api/package-enrollments"
-                        ).authenticated()
-                        
-                        // Đặt lịch PT: Phải đăng nhập
-                        .requestMatchers(
-                        HttpMethod.POST,
-                         "/api/bookings/pt"
-                        ).authenticated()
-
-                        //CHỈ ADMIN MỚI ĐƯỢC THÊM/SỬA/XÓA THIẾT BỊ
+                        // 2. Auth: Đăng ký & Đăng nhập không cần Token
+                        .requestMatchers(HttpMethod.POST, "/api/auth/register", "/api/auth/login").permitAll()
+                        .requestMatchers("/api/auth/me").authenticated()
+                        // 3. User Profile: Bắt buộc đăng nhập
+                        .requestMatchers("/api/users/**").authenticated()
+                        // 4. Các endpoint dành riêng cho ADMIN
+                        .requestMatchers("/api/admin/**").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.POST, "/api/equipments/**").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.PUT, "/api/equipments/**").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.DELETE, "/api/equipments/**").hasRole("ADMIN")
-
-                        //XEM CHI TIẾT BÀI TẬP BẮT BUỘC PHẢI ĐĂNG NHẬP (Bảo vệ nội dung)
+                        // 5. Nội dung cần Token của Học viên (Protected)
+                        .requestMatchers(HttpMethod.GET, "/api/packages/{id}").authenticated()
                         .requestMatchers(HttpMethod.GET, "/api/equipments/{id}").authenticated()
-
-                        //Khách vãng lai chỉ được xem danh sách tóm tắt thiết bị
+                        .requestMatchers(HttpMethod.POST, "/api/package-enrollments/**").authenticated()
+                        .requestMatchers(HttpMethod.GET, "/api/package-enrollments/**").authenticated()
+                        .requestMatchers(HttpMethod.POST, "/api/bookings/**").authenticated()
+                        // 6. Public Preview (Khách vãng lai xem trang chủ)
+                        .requestMatchers(HttpMethod.GET, "/api/packages").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/equipments").permitAll()
-
-                        // Tất cả các request còn lại
+                        .requestMatchers(HttpMethod.GET, "/api/products/**", "/api/product/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/trainers/**").permitAll()
+                        // 7. Tất cả các request còn lại bắt buộc có Token
                         .anyRequest().authenticated()
                 )
-
                 // Đăng ký JWT Filter đứng trước UsernamePasswordAuthenticationFilter
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
