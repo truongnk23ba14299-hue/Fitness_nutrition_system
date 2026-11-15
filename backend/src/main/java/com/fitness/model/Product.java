@@ -11,7 +11,14 @@ import java.time.LocalDateTime;
 @Table(name = "products")
 @Getter
 @Setter
-public class Products {
+public class Product {
+
+    public enum ProductStatus{
+        ACTIVE,
+        OUT_OF_STOCK,
+        INACTIVE,
+        DISCONTINUED
+    }
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -40,6 +47,10 @@ public class Products {
 
     @Column(name = "image_url")
     private String imageUrl;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name= "status", nullable = false)
+    private ProductStatus productStatus;
 
     @CreationTimestamp
     @Column(name = "created_at", updatable = false)

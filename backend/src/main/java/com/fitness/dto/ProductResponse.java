@@ -1,26 +1,22 @@
 package com.fitness.dto;
 
-import com.fitness.model.Products;
+import com.fitness.model.Product;
 import java.math.BigDecimal;
 
 public record ProductResponse(
         Long id,
         String name,
         String description,
-        String equipmentBrand,
-        BigDecimal price,
-        Integer stockQuantity,
-        BigDecimal weightKg
+        String brand,
+        BigDecimal price
 ){
-    public static ProductResponse fromEntity(Products p){
+    public static ProductResponse fromEntity(Product p){
         return new ProductResponse(
                 p.getId(),
                 p.getName(),
                 p.getDescription(),
                 p.getBrand(),
-                p.getPrice(),
-                p.getStockQuantity(),
-                p.getWeightKg()
+                p.getPrice()
         );
     }
 }

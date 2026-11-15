@@ -1,4 +1,5 @@
 package com.fitness.controller;
+import com.fitness.dto.AdminProductResponse;
 import com.fitness.dto.ProductRequest;
 import com.fitness.dto.ProductResponse;
 import com.fitness.service.AdminProductService;
@@ -9,12 +10,24 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.security.access.prepost.PreAuthorize;
 
+import java.util.List;
+
 @RestController
-@RequestMapping("/api/admin/product")
+@RequestMapping("/api/admin/products")
 @RequiredArgsConstructor
 @PreAuthorize("hasRole('ADMIN')")
 public class AdminProductController {
     private final AdminProductService adminProductService;
+
+    @GetMapping()
+    public ResponseEntity<List<AdminProductResponse>> getAdminProducts() {
+        return ResponseEntity.ok(adminProductService.getAllProducts());
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<AdminProductResponse> getAdminProductById(@PathVariable Long id) {
+        return ResponseEntity.ok(adminProductService.getProductById(id));
+    }
 
     @PostMapping
     public ResponseEntity<ProductResponse> addNewProducts(@Valid @RequestBody ProductRequest req) {

@@ -1,23 +1,40 @@
 package com.fitness.service;
+import com.fitness.dto.AdminProductResponse;
 import com.fitness.dto.ProductResponse;
 import com.fitness.dto.ProductRequest;
 import com.fitness.repository.ProductRepository;
-import com.fitness.model.Products;
+import com.fitness.model.Product;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import com.fitness.Exception.ResourceNotFoundException;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
 public class AdminProductService {
-    private final ProductRepository productRepository ;
+    private final ProductRepository productRepository;
+
+    @Transactional(readOnly = true)
+    public List<AdminProductResponse> getAllProducts() {
+        return productRepository.findAll()
+                .stream()
+                .map(AdminProductResponse::fromEntity)
+                .toList();
+    }
+
+    @Transactional(readOnly = true)
+    public AdminProductResponse getProductById(Long id) {
+        Product product =  productRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Product not found with id: " +id));
+        return AdminProductResponse.fromEntity(product);
+    }
 
     @Transactional
     public ProductResponse create(@Valid ProductRequest req) {
-        Products product = new Products();
+        Product product = new Product();
         applyRequest(product, req);
         product.setCreatedAt(LocalDateTime.now());
         product.setUpdatedAt(LocalDateTime.now());
@@ -27,7 +44,7 @@ public class AdminProductService {
 
     @Transactional
     public ProductResponse update(Long id, ProductRequest req) {
-        Products product = findOrThrow(id);
+        Product product = findOrThrow(id);
         applyRequest(product, req);
         product.setUpdatedAt(LocalDateTime.now());
         return ProductResponse.fromEntity(product);
@@ -38,12 +55,12 @@ public class AdminProductService {
         productRepository.deleteById(findOrThrow(id).getId());
     }
 
-    private Products findOrThrow(Long id){
+    private Product findOrThrow(Long id){
         return productRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Ko tìm thấy sản phẩm vs id: " +id));
     }
 
-    private void applyRequest(Products product, @Valid ProductRequest req) {
+    private void applyRequest(Product product, @Valid ProductRequest req) {
         product.setName(req.name().trim());
         product.setDescription(req.description());
         product.setCategory(req.category().trim());
@@ -53,4 +70,5 @@ public class AdminProductService {
         product.setImageUrl(req.imageUrl());
         product.setWeightKg(req.weightKg());
     }
+
 }
