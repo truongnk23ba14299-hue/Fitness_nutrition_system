@@ -12,5 +12,6 @@ public record UserProfileResponse(
         Double heightCm,
         Double weightKg,
         String avatarUrl,
-        LocalDateTime createdAt
+        LocalDateTime createdAt,
+        boolean hasActivePackage 
 ) {}
