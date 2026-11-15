@@ -2,7 +2,9 @@ package com.fitness.service;
 
 import com.fitness.dto.UpdateProfileRequest;
 import com.fitness.dto.UserProfileResponse;
+import com.fitness.model.EnrollmentStatus; 
 import com.fitness.model.User;
+import com.fitness.repository.PackageEnrollmentRepository;
 import com.fitness.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -13,11 +15,15 @@ import org.springframework.transaction.annotation.Transactional;
 public class UserService {
 
     private final UserRepository userRepository;
+    private final PackageEnrollmentRepository enrollmentRepository;
 
     // Xem thông tin cá nhân theo email từ Token
     public UserProfileResponse getProfile(String email) {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy người dùng!"));
+
+        // 2. KIỂM TRA XEM HỌC VIÊN CÓ GÓI TẬP ACTIVE HAY KHÔNG:
+        boolean hasActive = enrollmentRepository.existsByUserIdAndStatus(user.getId(), EnrollmentStatus.ACTIVE);
 
         return new UserProfileResponse(
                 user.getId(),
@@ -29,7 +35,8 @@ public class UserService {
                 user.getHeightCm(),
                 user.getWeightKg(),
                 user.getAvatarUrl(),
-                user.getCreatedAt()
+                user.getCreatedAt(),
+                hasActive
         );
     }
 
@@ -48,6 +55,8 @@ public class UserService {
 
         User updatedUser = userRepository.save(user);
 
+        boolean hasActive = enrollmentRepository.existsByUserIdAndStatus(updatedUser.getId(), EnrollmentStatus.ACTIVE);
+
         return new UserProfileResponse(
                 updatedUser.getId(),
                 updatedUser.getFullName(),
@@ -58,7 +67,8 @@ public class UserService {
                 updatedUser.getHeightCm(),
                 updatedUser.getWeightKg(),
                 updatedUser.getAvatarUrl(),
-                updatedUser.getCreatedAt()
+                updatedUser.getCreatedAt(),
+                hasActive
         );
     }
 }
