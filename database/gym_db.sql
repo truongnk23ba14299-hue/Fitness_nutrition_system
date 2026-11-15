@@ -1,5 +1,4 @@
--- ====================================================================
--- BƯỚC 1: XÓA SẠCH DỮ LIỆU VÀ RESET TẤT CẢ ID VỀ 1
+-- XÓA SẠCH DỮ LIỆU CŨ VÀ RESET TẤT CẢ KHÓA CHÍNH (ID) VỀ 1
 -- ====================================================================
 TRUNCATE TABLE
     package_enrollments,
@@ -11,27 +10,61 @@ TRUNCATE TABLE
 RESTART IDENTITY CASCADE;
 
 -- ====================================================================
--- BƯỚC 2: NẠP LẠI DỮ LIỆU MẪU CHUẨN (BẮT ĐẦU TỪ ID = 1)
--- MẬT KHẨU MẶC ĐỊNH CỦA TẤT CẢ TÀI KHOẢN LÀ: 123456
+-- NẠP DỮ LIỆU MẪU CHUẨN (CHUẨN XÁC 100% QUAN HỆ FOREIGN KEY)
 -- ====================================================================
 
--- 1. Nạp Users (ID sẽ là 1, 2, 3, 4, 5, 6)
+-- --------------------------------------------------------------------
+-- 1. NẠP BẢNG USERS (Chuẩn hóa 4 Role - Tổng cộng 8 tài khoản mẫu)
+-- Hash BCrypt cho '123456': $2a$10$S/Do9GNmyWs2/uz.oEQk2e4afTCVyozeyVoTbc2apA7wOE1A6U2te
+-- --------------------------------------------------------------------
 INSERT INTO users (full_name, email, password_hash, role, phone, address, height_cm, weight_kg) VALUES
+-- Role 1: Quản Trị Viên Hệ Thống (Admin - ID = 1)
 ('Nguyễn Khắc Trường (Admin)', 'admin@gym.com', '$2a$10$S/Do9GNmyWs2/uz.oEQk2e4afTCVyozeyVoTbc2apA7wOE1A6U2te', 'ROLE_ADMIN', '0988111222', 'Hà Nội', 175.0, 72.0),
+
+-- Role 2: Nhân Viên Lễ Tân / Vận Hành Quầy (Staff - ID = 2)
+('Nguyễn Thu Trang (Lễ tân)', 'staff@gym.com', '$2a$10$S/Do9GNmyWs2/uz.oEQk2e4afTCVyozeyVoTbc2apA7wOE1A6U2te', 'ROLE_STAFF', '0933221100', 'Hà Nội', 162.0, 48.0),
+
+-- Role 3: Đội ngũ Huấn Luyện Viên Cá Nhân (Trainer / PT - ID = 3, 4, 5, 6)
 ('Trần Văn Hoàng (PT)', 'pt_hoang@gym.com', '$2a$10$S/Do9GNmyWs2/uz.oEQk2e4afTCVyozeyVoTbc2apA7wOE1A6U2te', 'ROLE_TRAINER', '0912345678', 'Hồ Chí Minh', 180.0, 80.0),
 ('Lê Thị Mai (PT Yoga)', 'pt_mai@gym.com', '$2a$10$S/Do9GNmyWs2/uz.oEQk2e4afTCVyozeyVoTbc2apA7wOE1A6U2te', 'ROLE_TRAINER', '0922334455', 'Đà Nẵng', 165.0, 52.0),
 ('Nguyễn Quốc Cường (PT Calisthenics)', 'pt_cuong@gym.com', '$2a$10$S/Do9GNmyWs2/uz.oEQk2e4afTCVyozeyVoTbc2apA7wOE1A6U2te', 'ROLE_TRAINER', '0933445566', 'Hà Nội', 178.0, 75.0),
 ('Đỗ Hải Đăng (PT Classic)', 'pt_dang@gym.com', '$2a$10$S/Do9GNmyWs2/uz.oEQk2e4afTCVyozeyVoTbc2apA7wOE1A6U2te', 'ROLE_TRAINER', '0944556677', 'Hồ Chí Minh', 182.0, 85.0),
-('Cao Tuấn (Học viên)', 'caotuan@gmail.com', '$2a$10$S/Do9GNmyWs2/uz.oEQk2e4afTCVyozeyVoTbc2apA7wOE1A6U2te', 'ROLE_CLIENT', '0977889900', 'Hải Phòng', 170.0, 65.5);
 
--- 2. Nạp Khóa tập (Bao gồm gói trải nghiệm ngày, 1 tháng, 6 tháng, 12 tháng)
+-- Role 4.1: MEMBER ĐÃ CÓ GÓI TẬP CÒN HẠN (Hội viên chính thức VIP - ID = 7)
+('Cao Tuấn (Hội viên VIP)', 'caotuan@gmail.com', '$2a$10$S/Do9GNmyWs2/uz.oEQk2e4afTCVyozeyVoTbc2apA7wOE1A6U2te', 'ROLE_CLIENT', '0977889900', 'Hải Phòng', 170.0, 65.5),
+
+-- Role 4.2: MEMBER VỪA TẠO TÀI KHOẢN, CHƯA MUA GÓI (Thành viên tiềm năng - ID = 8)
+('Trần Minh Đức (Thành viên mới)', 'minhduc@gmail.com', '$2a$10$S/Do9GNmyWs2/uz.oEQk2e4afTCVyozeyVoTbc2apA7wOE1A6U2te', 'ROLE_CLIENT', '0966554433', 'Đà Nẵng', 172.0, 68.0);
+
+-- --------------------------------------------------------------------
+-- 2. NẠP BẢNG PACKAGES (Các gói tập Gym tiêu chuẩn & VIP - ID = 1, 2, 3, 4)
+-- --------------------------------------------------------------------
 INSERT INTO packages (title, description, price, duration_months, image_url, benefits, schedule_details, is_active) VALUES
 ('Gói Vé Tập Trải Nghiệm Trong Ngày (Daily Pass)', 'Trải nghiệm không giới hạn tất cả các khu vực máy tập, phòng xông hơi Sauna và tủ đồ VIP trong 01 ngày.', 50000.00, 1, 'https://images.unsplash.com/photo-1517838277536-f5f99be501cd', 'Sử dụng miễn phí tủ đồ thông minh, nước uống, khăn tập, đo InBody miễn phí 1 lần', 'Áp dụng toàn bộ khung giờ từ 05:30 đến 21:30 trong ngày đăng ký', TRUE),
 ('Gói Gym Tiêu Chuẩn (1 Tháng)', 'Tập luyện không giới hạn khung giờ tất cả các ngày trong tuần tại phòng tập.', 500000.00, 1, 'https://images.unsplash.com/photo-1534438327276-14e5300c3a48', 'Miễn phí tủ đồ, nước uống, phòng tắm nóng lạnh', 'Từ 05:30 đến 21:30 hàng ngày', TRUE),
 ('Gói Khỏe Đẹp Toàn Diện (6 Tháng)', 'Bao gồm Gym + Lớp Yoga + Phòng xông hơi khô Sauna chuẩn quốc tế.', 2400000.00, 6, 'https://images.unsplash.com/photo-1518611012118-696072aa579a', 'Tặng 2 buổi tập thử cùng PT chuyên nghiệp, tủ đồ VIP', 'Không giới hạn thời gian', TRUE),
 ('Gói Hội Viên VIP Thượng Hạng (12 Tháng)', 'Trải nghiệm đỉnh cao không giới hạn mọi dịch vụ trên toàn hệ thống phòng tập.', 4200000.00, 12, 'https://images.unsplash.com/photo-1540497077202-7c8a3999166f', 'Tặng 5 buổi PT riêng, đo chỉ số InBody miễn phí hàng tháng', 'Full 24/7', TRUE);
 
--- 3. Nạp Sản phẩm dinh dưỡng, dụng cụ & phụ kiện
+-- --------------------------------------------------------------------
+-- 3. NẠP BẢNG TRAINERS (Danh sách Huấn Luyện Viên đại diện - ID = 1, 2, 3, 4)
+-- --------------------------------------------------------------------
+INSERT INTO trainers (full_name, avatar_url, bio, experience_years, specialty, rating, is_active) VALUES
+('Trần Văn Hoàng', 'https://images.unsplash.com/photo-1567013127542-490d757e51fc', 'Chứng chỉ HLV Thể hình Quốc tế NASM, từng đoạt HCB Thể hình Quốc gia 2022.', 5, 'Tăng cơ, Siết mỡ, Boxing cường độ cao', 4.90, TRUE),
+('Lê Thị Mai', 'https://images.unsplash.com/photo-1518611012118-696072aa579a', 'Bậc thầy Yoga 200 giờ tại Ấn Độ, chuyên trị liệu xương khớp và thon gọn vóc dáng.', 4, 'Yoga Trị Liệu, Pilates, Cải thiện tư thế', 5.00, TRUE),
+('Nguyễn Quốc Cường', 'https://images.unsplash.com/photo-1541534741688-6078c6bfb5c5', 'Chuyên gia huấn luyện thể lực & Calisthenics, có 6 năm kinh nghiệm đào tạo VĐV thể hình.', 6, 'Calisthenics, Phục hồi chức năng, Tăng sức bền', 4.95, TRUE),
+('Đỗ Hải Đăng', 'https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b', 'VĐV Thể hình cổ điển (Classic Physique), chuyên gia dinh dưỡng và giảm mỡ cấp tốc.', 5, 'Classic Physique, Siết cơ chuyên sâu, Kickboxing', 4.90, TRUE);
+
+-- --------------------------------------------------------------------
+-- 4. NẠP HỢP ĐỒNG GÓI TẬP (PACKAGE_ENROLLMENTS - MÔ HÌNH CHUẨN F8)
+-- Kích hoạt gói 6 tháng còn hạn cho Hội viên VIP Cao Tuấn (user_id = 7, package_id = 3, trainer_id = 1)
+-- Tài khoản Trần Minh Đức (user_id = 8) cố tình KHÔNG có bản ghi nào để mô phỏng Member chưa mua gói
+-- --------------------------------------------------------------------
+INSERT INTO package_enrollments (user_id, package_id, trainer_id, total_price, start_date, end_date, status, notes) VALUES
+(7, 3, 1, 2400000.00, CURRENT_DATE, CURRENT_DATE + INTERVAL '6 months', 'ACTIVE', 'Hợp đồng kích hoạt tự động cho Hội viên VIP');
+
+-- --------------------------------------------------------------------
+-- 5. NẠP BẢNG PRODUCTS (Dinh dưỡng, Dụng cụ & Phụ kiện chính hãng)
+-- --------------------------------------------------------------------
 INSERT INTO products (name, description, category, brand, price, stock_quantity, weight_kg, image_url) VALUES
 -- Thực phẩm bổ sung (4 sản phẩm)
 ('Sữa Tăng Cơ Whey Gold Standard 5Lbs', 'Bổ sung 24g Protein tinh khiết phục hồi cơ bắp nhanh chóng sau khi tập.', 'THỰC PHẨM BỔ SUNG', 'Optimum Nutrition', 1850000.00, 25, 2.27, 'https://images.unsplash.com/photo-1593095948071-474c5cc2989d'),
@@ -49,14 +82,9 @@ INSERT INTO products (name, description, category, brand, price, stock_quantity,
 ('Đai Lưng Cứng Deadlift & Squat Da Bò Valeo', 'Bảo vệ cột sống thắt lưng tối đa khi nâng tạ nặng, chất liệu da bò êm ái bền bỉ.', 'PHỤ KIỆN', 'Valeo', 450000.00, 45, 0.50, 'https://images.unsplash.com/photo-1517838277536-f5f99be501cd'),
 ('Dây Kéo Lưng Lifting Straps Trợ Lực Nâng Tạ', 'Hỗ trợ chống mỏi cổ tay, gia tăng lực kéo trong các bài Deadlift và Kéo xô.', 'PHỤ KIỆN', 'Harbinger', 180000.00, 90, 0.15, 'https://images.unsplash.com/photo-1583454110551-21f2fa2afe61');
 
--- 4. Nạp Huấn luyện viên (ID sẽ là 1, 2, 3, 4)
-INSERT INTO trainers (full_name, avatar_url, bio, experience_years, specialty, rating, is_active) VALUES
-('Trần Văn Hoàng', 'https://images.unsplash.com/photo-1567013127542-490d757e51fc', 'Chứng chỉ HLV Thể hình Quốc tế NASM, từng đoạt HCB Thể hình Quốc gia 2022.', 5, 'Tăng cơ, Siết mỡ, Boxing cường độ cao', 4.90, TRUE),
-('Lê Thị Mai', 'https://images.unsplash.com/photo-1518611012118-696072aa579a', 'Bậc thầy Yoga 200 giờ tại Ấn Độ, chuyên trị liệu xương khớp và thon gọn vóc dáng.', 4, 'Yoga Trị Liệu, Pilates, Cải thiện tư thế', 5.00, TRUE),
-('Nguyễn Quốc Cường', 'https://images.unsplash.com/photo-1541534741688-6078c6bfb5c5', 'Chuyên gia huấn luyện thể lực & Calisthenics, có 6 năm kinh nghiệm đào tạo VĐV thể hình.', 6, 'Calisthenics, Phục hồi chức năng, Tăng sức bền', 4.95, TRUE),
-('Đỗ Hải Đăng', 'https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b', 'VĐV Thể hình cổ điển (Classic Physique), chuyên gia dinh dưỡng và giảm mỡ cấp tốc.', 5, 'Classic Physique, Siết cơ chuyên sâu, Kickboxing', 4.90, TRUE);
-
--- 5. Nạp Thiết bị phòng tập (ID sẽ là 1, 2, 3, 4, 5, 6, 7)
+-- --------------------------------------------------------------------
+-- 6. NẠP BẢNG EQUIPMENTS (Dàn máy tập & Hướng dẫn kỹ thuật chuẩn của PT)
+-- --------------------------------------------------------------------
 INSERT INTO equipments (name, brand, image_url, workout_guide, target_muscle) VALUES
 (
     'Máy Chạy Bộ Điện Cao Cấp',
