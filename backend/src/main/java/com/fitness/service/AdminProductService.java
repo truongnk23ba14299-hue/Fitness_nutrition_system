@@ -55,6 +55,23 @@ public class AdminProductService {
         productRepository.deleteById(findOrThrow(id).getId());
     }
 
+    // ==== Minh Quang: Nhập thêm số lượng tồn kho (stockQuantity) khi có đợt hàng mới ====
+    @Transactional
+    public AdminProductResponse addStock(Long id, Integer additionalStock) {
+        Product product = findOrThrow(id);
+        if (additionalStock == null || additionalStock <= 0) {
+            throw new IllegalArgumentException("Số lượng nhập thêm phải lớn hơn 0");
+        }
+        product.setStockQuantity(product.getStockQuantity() + additionalStock);
+        // Hết hàng trước đó (OUT_OF_STOCK) -> tự bật lại ACTIVE sau khi nhập hàng
+        if (product.getProductStatus() == Product.ProductStatus.OUT_OF_STOCK
+                && product.getStockQuantity() > 0) {
+            product.setProductStatus(Product.ProductStatus.ACTIVE);
+        }
+        product.setUpdatedAt(LocalDateTime.now());
+        return AdminProductResponse.fromEntity(product);
+    }
+
     private Product findOrThrow(Long id){
         return productRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Ko tìm thấy sản phẩm vs id: " +id));

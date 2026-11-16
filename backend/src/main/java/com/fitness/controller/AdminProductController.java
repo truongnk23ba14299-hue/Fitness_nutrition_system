@@ -46,4 +46,12 @@ public class AdminProductController {
         adminProductService.delete(id);
         return ResponseEntity.noContent().build();
     }
+
+    // ==== Minh Quang: PUT /api/admin/products/{id}/stock — Nhập thêm tồn kho khi có đợt hàng mới ====
+    @PutMapping("/{id}/stock")
+    public ResponseEntity<AdminProductResponse> updateProductStock(
+            @PathVariable Long id,
+            @Valid @RequestBody com.fitness.dto.UpdateStockRequest req) {
+        return ResponseEntity.ok(adminProductService.addStock(id, req.additionalStock()));
+    }
 }
