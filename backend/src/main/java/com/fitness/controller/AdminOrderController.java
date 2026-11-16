@@ -2,7 +2,7 @@ package com.fitness.controller;
 
 import com.fitness.dto.AdminOrderResponse;
 import com.fitness.dto.UpdateOrderStatusRequest;
-import com.fitness.model.OrderStatus;
+import com.fitness.dto.OrderResponse;
 import com.fitness.service.AdminOrderService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
