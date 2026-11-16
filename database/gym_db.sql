@@ -65,22 +65,32 @@ INSERT INTO package_enrollments (user_id, package_id, trainer_id, total_price, s
 -- --------------------------------------------------------------------
 -- 5. NẠP BẢNG PRODUCTS (Dinh dưỡng, Dụng cụ & Phụ kiện chính hãng)
 -- --------------------------------------------------------------------
-INSERT INTO products (name, description, category, brand, price, stock_quantity, weight_kg, image_url) VALUES
+INSERT INTO products (
+    name,
+    description,
+    category,
+    brand,
+    price,
+    stock_quantity,
+    weight_kg,
+    image_url,
+    status
+) VALUES
 -- Thực phẩm bổ sung (4 sản phẩm)
-('Sữa Tăng Cơ Whey Gold Standard 5Lbs', 'Bổ sung 24g Protein tinh khiết phục hồi cơ bắp nhanh chóng sau khi tập.', 'THỰC PHẨM BỔ SUNG', 'Optimum Nutrition', 1850000.00, 25, 2.27, 'https://images.unsplash.com/photo-1593095948071-474c5cc2989d'),
-('Creatine Monohydrate Tăng Sức Mạnh Rule 1 (300g)', 'Tăng cường sản sinh ATP, hỗ trợ bộc phát sức mạnh tối đa trong các bài tập tạ nặng.', 'THỰC PHẨM BỔ SUNG', 'Rule 1', 520000.00, 50, 0.30, 'https://images.unsplash.com/photo-1579722821273-0f6c7d44362f'),
-('BCAA + EAA Phục Hồi Chống Mệt Mỏi Mutant Geaar 30 Servings', 'Cung cấp 9 loại Amino Acid thiết yếu chống dị hóa cơ và phục hồi tức thì trong khi tập.', 'THỰC PHẨM BỔ SUNG', 'Mutant', 680000.00, 35, 0.38, 'https://images.unsplash.com/photo-1594882645126-14020914d58d'),
-('Pre-Workout C4 Original Bùng Nổ Năng Lượng 60 Servings', 'Kích thích tỉnh táo, tăng cường lưu thông máu và tối đa hóa năng lượng tập luyện.', 'THỰC PHẨM BỔ SUNG', 'Cellucor', 890000.00, 30, 0.39, 'https://images.unsplash.com/photo-1546483875-ad9014c88eba'),
+('Sữa Tăng Cơ Whey Gold Standard 5Lbs', 'Bổ sung 24g Protein tinh khiết phục hồi cơ bắp nhanh chóng sau khi tập.', 'THỰC PHẨM BỔ SUNG', 'Optimum Nutrition', 1850000.00, 25, 2.27, 'https://images.unsplash.com/photo-1593095948071-474c5cc2989d', 'ACTIVE'),
+('Creatine Monohydrate Tăng Sức Mạnh Rule 1 (300g)', 'Tăng cường sản sinh ATP, hỗ trợ bộc phát sức mạnh tối đa trong các bài tập tạ nặng.', 'THỰC PHẨM BỔ SUNG', 'Rule 1', 520000.00, 50, 0.30, 'https://images.unsplash.com/photo-1579722821273-0f6c7d44362f', 'ACTIVE'),
+('BCAA + EAA Phục Hồi Chống Mệt Mỏi Mutant Geaar 30 Servings', 'Cung cấp 9 loại Amino Acid thiết yếu chống dị hóa cơ và phục hồi tức thì trong khi tập.', 'THỰC PHẨM BỔ SUNG', 'Mutant', 680000.00, 35, 0.38, 'https://images.unsplash.com/photo-1594882645126-14020914d58d', 'ACTIVE'),
+('Pre-Workout C4 Original Bùng Nổ Năng Lượng 60 Servings', 'Kích thích tỉnh táo, tăng cường lưu thông máu và tối đa hóa năng lượng tập luyện.', 'THỰC PHẨM BỔ SUNG', 'Cellucor', 890000.00, 30, 0.39, 'https://images.unsplash.com/photo-1546483875-ad9014c88eba', 'ACTIVE'),
 
 -- Dụng cụ tập luyện (3 sản phẩm)
-('Bình Lắc Tập Gym Shaker 700ml', 'Bình nhựa cao cấp không chứa BPA có lưới đánh tan bột siêu mịn.', 'DỤNG CỤ', 'GymPro', 120000.00, 100, 0.35, 'https://images.unsplash.com/photo-1517838277536-f5f99be501cd'),
-('Con Lăn Tập Cơ Bụng 4 Bánh Kèm Đệm Đầu Gối', 'Thiết kế 4 bánh chịu lực chống trơn trượt, hỗ trợ siết cơ bụng 6 múi săn chắc.', 'DỤNG CỤ', 'GymPro', 190000.00, 60, 0.85, 'https://images.unsplash.com/photo-1598971639058-fab3c3109a00'),
-('Bộ Dây Kháng Lực Đàn Hồi Power Band (Set 5 Dây)', 'Cao su thiên nhiên cao cấp, hỗ trợ tập đu xà, khởi động và tập toàn thân.', 'DỤNG CỤ', 'Aolikes', 290000.00, 80, 0.60, 'https://images.unsplash.com/photo-1518611012118-696072aa579a'),
+('Bình Lắc Tập Gym Shaker 700ml', 'Bình nhựa cao cấp không chứa BPA có lưới đánh tan bột siêu mịn.', 'DỤNG CỤ', 'GymPro', 120000.00, 100, 0.35, 'https://images.unsplash.com/photo-1517838277536-f5f99be501cd', 'ACTIVE'),
+('Con Lăn Tập Cơ Bụng 4 Bánh Kèm Đệm Đầu Gối', 'Thiết kế 4 bánh chịu lực chống trơn trượt, hỗ trợ siết cơ bụng 6 múi săn chắc.', 'DỤNG CỤ', 'GymPro', 190000.00, 60, 0.85, 'https://images.unsplash.com/photo-1598971639058-fab3c3109a00', 'ACTIVE'),
+('Bộ Dây Kháng Lực Đàn Hồi Power Band (Set 5 Dây)', 'Cao su thiên nhiên cao cấp, hỗ trợ tập đu xà, khởi động và tập toàn thân.', 'DỤNG CỤ', 'Aolikes', 290000.00, 80, 0.60, 'https://images.unsplash.com/photo-1518611012118-696072aa579a', 'ACTIVE'),
 
 -- Phụ kiện tập gym (3 sản phẩm)
-('Găng Tay Tập Gym Có Cuốn Cổ Tay Harbinger', 'Bảo vệ lòng bàn tay chống chai sạn, tăng độ bám khi nâng tạ nặng.', 'PHỤ KIỆN', 'Harbinger', 350000.00, 40, 0.20, 'https://images.unsplash.com/photo-1583454110551-21f2fa2afe61'),
-('Đai Lưng Cứng Deadlift & Squat Da Bò Valeo', 'Bảo vệ cột sống thắt lưng tối đa khi nâng tạ nặng, chất liệu da bò êm ái bền bỉ.', 'PHỤ KIỆN', 'Valeo', 450000.00, 45, 0.50, 'https://images.unsplash.com/photo-1517838277536-f5f99be501cd'),
-('Dây Kéo Lưng Lifting Straps Trợ Lực Nâng Tạ', 'Hỗ trợ chống mỏi cổ tay, gia tăng lực kéo trong các bài Deadlift và Kéo xô.', 'PHỤ KIỆN', 'Harbinger', 180000.00, 90, 0.15, 'https://images.unsplash.com/photo-1583454110551-21f2fa2afe61');
+('Găng Tay Tập Gym Có Cuốn Cổ Tay Harbinger', 'Bảo vệ lòng bàn tay chống chai sạn, tăng độ bám khi nâng tạ nặng.', 'PHỤ KIỆN', 'Harbinger', 350000.00, 40, 0.20, 'https://images.unsplash.com/photo-1583454110551-21f2fa2afe61', 'ACTIVE'),
+('Đai Lưng Cứng Deadlift & Squat Da Bò Valeo', 'Bảo vệ cột sống thắt lưng tối đa khi nâng tạ nặng, chất liệu da bò êm ái bền bỉ.', 'PHỤ KIỆN', 'Valeo', 450000.00, 45, 0.50, 'https://images.unsplash.com/photo-1517838277536-f5f99be501cd', 'ACTIVE'),
+('Dây Kéo Lưng Lifting Straps Trợ Lực Nâng Tạ', 'Hỗ trợ chống mỏi cổ tay, gia tăng lực kéo trong các bài Deadlift và Kéo xô.', 'PHỤ KIỆN', 'Harbinger', 180000.00, 90, 0.15, 'https://images.unsplash.com/photo-1583454110551-21f2fa2afe61', 'ACTIVE');
 
 -- --------------------------------------------------------------------
 -- 6. NẠP BẢNG EQUIPMENTS (Dàn máy tập & Hướng dẫn kỹ thuật chuẩn của PT)

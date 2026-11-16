@@ -34,6 +34,10 @@ public class User implements UserDetails {
 
     @Column(nullable = false, length = 50)
     private String role;
+
+    @Column(name = "status", length = 30)
+    @Builder.Default
+    private String status = "ACTIVE";
     private String phone;
     private String address;
 
@@ -85,4 +89,6 @@ public class User implements UserDetails {
     public boolean isEnabled() {
         return true;
     }
+
+
 }
