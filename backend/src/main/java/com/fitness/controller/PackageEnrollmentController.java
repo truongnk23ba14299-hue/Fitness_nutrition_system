@@ -9,6 +9,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/package-enrollments")
@@ -27,5 +28,12 @@ public class PackageEnrollmentController {
         String email = authentication.getName();
         EnrollmentResponse response = packageEnrollmentService.enrollPackage(email, request);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    }
+    // GET /api/package-enrollments/my-enrollments
+    @GetMapping("/my-enrollments")
+    public ResponseEntity<List<EnrollmentResponse>> getMyEnrollments(Authentication authentication) 
+    {
+            String email = authentication.getName();
+            return ResponseEntity.ok(packageEnrollmentService.getMyEnrollments(email));
     }
 }   
