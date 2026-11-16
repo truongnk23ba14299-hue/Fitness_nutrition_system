@@ -1,43 +1,42 @@
 package com.fitness.dto;
 
 import com.fitness.model.Order;
-import com.fitness.model.OrderStatus;
+import com.fitness.model.OrderItem;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 
+// Response cho Admin — đặt tên field khớp với OrderResponse của tuantinhte17-droid
 public record AdminOrderResponse(
-        Long id,
+        Long orderId,
         Long userId,
         String customerName,
         String customerEmail,
-        String recipientName,
-        String recipientPhone,
+        String receiverName,
+        String phone,
         String shippingAddress,
         String note,
-        BigDecimal totalPrice,
-        OrderStatus status,
+        BigDecimal totalAmount,
+        Order.OrderStatus status,
         List<AdminOrderItemResponse> items,
-        LocalDateTime createdAt,
-        LocalDateTime updatedAt
+        LocalDateTime createdAt
 ){
-    public static AdminOrderResponse fromEntity(Order order, String customerName, String customerEmail) {
+    public static AdminOrderResponse fromEntity(Order order) {
         return new AdminOrderResponse(
                 order.getId(),
-                order.getUserId(),
-                customerName,
-                customerEmail,
-                order.getRecipientName(),
-                order.getRecipientPhone(),
+                order.getUser() != null ? order.getUser().getId() : null,
+                order.getUser() != null ? order.getUser().getFullName() : null,
+                order.getUser() != null ? order.getUser().getEmail() : null,
+                order.getReceiverName(),
+                order.getPhone(),
                 order.getShippingAddress(),
                 order.getNote(),
-                order.getTotalPrice(),
-                order.getStatus(),
+                order.getTotalAmount(),
+                order.getOrderStatus(),
                 order.getItems().stream()
                         .map(AdminOrderItemResponse::fromEntity)
                         .toList(),
-                order.getCreatedAt(),
-                order.getUpdatedAt()
+                order.getCreatedAt()
         );
     }
 }

@@ -3,22 +3,21 @@ package com.fitness.dto;
 import com.fitness.model.OrderItem;
 import java.math.BigDecimal;
 
+// Đặt tên field khớp với OrderItemResponse của tuantinhte17-droid
 public record AdminOrderItemResponse(
-        Long id,
         Long productId,
         String productName,
-        BigDecimal price,
         Integer quantity,
-        BigDecimal lineTotal
+        BigDecimal unitPrice,
+        BigDecimal subTotal
 ){
     public static AdminOrderItemResponse fromEntity(OrderItem item) {
         return new AdminOrderItemResponse(
-                item.getId(),
-                item.getProductId(),
+                item.getProduct() != null ? item.getProduct().getId() : null,
                 item.getProductName(),
-                item.getPrice(),
                 item.getQuantity(),
-                item.getPrice().multiply(BigDecimal.valueOf(item.getQuantity()))
+                item.getUnitPrice(),
+                item.getSubTotal()
         );
     }
 }

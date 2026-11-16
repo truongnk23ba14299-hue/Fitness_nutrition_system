@@ -2,7 +2,7 @@ package com.fitness.controller;
 
 import com.fitness.dto.AdminOrderResponse;
 import com.fitness.dto.UpdateOrderStatusRequest;
-import com.fitness.dto.OrderResponse;
+import com.fitness.model.Order;
 import com.fitness.service.AdminOrderService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -23,7 +23,7 @@ public class AdminOrderController {
     // GET /api/admin/orders?status=PENDING / ?status=COMPLETED -> lọc theo trạng thái
     @GetMapping
     public ResponseEntity<List<AdminOrderResponse>> getAllOrders(
-            @RequestParam(required = false) OrderStatus status) {
+            @RequestParam(required = false) Order.OrderStatus status) {
         return ResponseEntity.ok(adminOrderService.getAllOrders(status));
     }
 

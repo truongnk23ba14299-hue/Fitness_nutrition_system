@@ -150,29 +150,35 @@ INSERT INTO equipments (name, brand, image_url, workout_guide, target_muscle) VA
 -- 7. ĐƠN HÀNG SHOP (ORDERS & ORDER_ITEMS) — Minh Quang
 --    Admin quản lý xử lý đơn hàng của học viên & tồn kho sản phẩm
 --    Luồng trạng thái: PENDING -> CONFIRMED -> SHIPPING -> COMPLETED / CANCELLED
+--    (Schema khớp entity Order/OrderItem của tuantinhte17-droid)
 -- ====================================================================
 
 CREATE TABLE IF NOT EXISTS orders (
     id BIGSERIAL PRIMARY KEY,
     user_id BIGINT NOT NULL,
-    recipient_name VARCHAR(100) NOT NULL,
-    recipient_phone VARCHAR(20) NOT NULL,
-    shipping_address VARCHAR(255) NOT NULL,
+    receiver_name VARCHAR(100) NOT NULL,
+    phone VARCHAR(20) NOT NULL,
+    shipping_address VARCHAR(500) NOT NULL,
     note TEXT,
-    total_price NUMERIC(12, 2) NOT NULL,
-    status VARCHAR(30) NOT NULL DEFAULT 'PENDING',
+    total_amount NUMERIC(12, 2) NOT NULL,
+    order_status VARCHAR(30) NOT NULL DEFAULT 'PENDING',
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP
 );
+CREATE INDEX IF NOT EXISTS idx_orders_user_id ON orders(user_id);
+CREATE INDEX IF NOT EXISTS idx_orders_status ON orders(order_status);
 
 CREATE TABLE IF NOT EXISTS order_items (
     id BIGSERIAL PRIMARY KEY,
     order_id BIGINT NOT NULL REFERENCES orders(id) ON DELETE CASCADE,
     product_id BIGINT NOT NULL,
-    product_name VARCHAR(150) NOT NULL,
-    price NUMERIC(12, 2) NOT NULL,
-    quantity INTEGER NOT NULL
+    product_name VARCHAR(255) NOT NULL,
+    quantity INTEGER NOT NULL CHECK (quantity > 0),
+    unit_price NUMERIC(12, 2) NOT NULL,
+    sub_total NUMERIC(12, 2) NOT NULL,
+    CONSTRAINT uk_order_items_order_product UNIQUE (order_id, product_id)
 );
+CREATE INDEX IF NOT EXISTS idx_order_items_product_id ON order_items(product_id);
 
 TRUNCATE TABLE order_items, orders RESTART IDENTITY CASCADE;
 
@@ -180,17 +186,18 @@ TRUNCATE TABLE order_items, orders RESTART IDENTITY CASCADE;
 -- 7.1. NẠP ĐƠN HÀNG MẪU (ORDERS)
 -- Đơn của Hội viên VIP Cao Tuấn (user_id = 7) và Thành viên Trần Minh Đức (user_id = 8)
 -- --------------------------------------------------------------------
-INSERT INTO orders (user_id, recipient_name, recipient_phone, shipping_address, note, total_price, status) VALUES
+INSERT INTO orders (user_id, receiver_name, phone, shipping_address, note, total_amount, order_status) VALUES
 (7, 'Cao Tuấn', '0977889900', 'Hải Phòng', 'Giao giờ hành chính, gọi trước khi giao', 2540000.00, 'PENDING'),
 (8, 'Trần Minh Đức', '0966554433', 'Đà Nẵng', NULL, 680000.00, 'CONFIRMED'),
 (7, 'Cao Tuấn', '0977889900', 'Hải Phòng', 'Đơn đã hoàn tất - đã nhận hàng', 520000.00, 'COMPLETED');
 
 -- --------------------------------------------------------------------
 -- 7.2. NẠP CHI TIẾT ĐƠN HÀNG (ORDER_ITEMS - product_id tham chiếu bảng products ở mục 5)
+-- sub_total = unit_price * quantity
 -- --------------------------------------------------------------------
-INSERT INTO order_items (order_id, product_id, product_name, price, quantity) VALUES
-(1, 1, 'Sữa Tăng Cơ Whey Gold Standard 5Lbs', 1850000.00, 1),
-(1, 5, 'Bình Lắc Tập Gym Shaker 700ml', 120000.00, 2),
-(1, 9, 'Đai Lưng Cứng Deadlift & Squat Da Bò Valeo', 450000.00, 1),
-(2, 3, 'BCAA + EAA Phục Hồi Chống Mệt Mỏi Mutant Geaar 30 Servings', 680000.00, 1),
-(3, 2, 'Creatine Monohydrate Tăng Sức Mạnh Rule 1 (300g)', 520000.00, 1);
+INSERT INTO order_items (order_id, product_id, product_name, quantity, unit_price, sub_total) VALUES
+(1, 1, 'Sữa Tăng Cơ Whey Gold Standard 5Lbs', 1, 1850000.00, 1850000.00),
+(1, 5, 'Bình Lắc Tập Gym Shaker 700ml', 2, 120000.00, 240000.00),
+(1, 9, 'Đai Lưng Cứng Deadlift & Squat Da Bò Valeo', 1, 450000.00, 450000.00),
+(2, 3, 'BCAA + EAA Phục Hồi Chống Mệt Mỏi Mutant Geaar 30 Servings', 1, 680000.00, 680000.00),
+(3, 2, 'Creatine Monohydrate Tăng Sức Mạnh Rule 1 (300g)', 1, 520000.00, 520000.00);
