@@ -57,19 +57,12 @@ public class AdminProductService {
     }
 
     // ==== Minh Quang: Nhập thêm số lượng tồn kho (stockQuantity) khi có đợt hàng mới ====
+    // Dùng domain method increaseStock() của Product (phần của tuantinhte17-droid) để không lặp logic:
+    // qty > 0, cộng dồn, tự chuyển OUT_OF_STOCK -> ACTIVE khi có hàng
     @Transactional
     public AdminProductResponse addStock(Long id, Integer additionalStock) {
         Product product = findOrThrow(id);
-        if (additionalStock == null || additionalStock <= 0) {
-            throw new IllegalArgumentException("Số lượng nhập thêm phải lớn hơn 0");
-        }
-        product.setStockQuantity(product.getStockQuantity() + additionalStock);
-        // Hết hàng trước đó (OUT_OF_STOCK) -> tự bật lại ACTIVE sau khi nhập hàng
-        if (product.getProductStatus() == Product.ProductStatus.OUT_OF_STOCK
-                && product.getStockQuantity() > 0) {
-            product.setProductStatus(Product.ProductStatus.ACTIVE);
-        }
-        product.setUpdatedAt(LocalDateTime.now());
+        product.increaseStock(additionalStock);
         return AdminProductResponse.fromEntity(product);
     }
 
