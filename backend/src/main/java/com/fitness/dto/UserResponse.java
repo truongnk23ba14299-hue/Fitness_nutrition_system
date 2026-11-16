@@ -6,7 +6,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 @Data
@@ -18,13 +17,8 @@ public class UserResponse {
     private Long id;
     private String email;
     private String fullName;
-    private String phone;
-    private String address;
-    private Double heightCm;
-    private Double weightKg;
     private String avatarUrl;
     private List<String> roles;
-    private LocalDateTime createdAt;
 
     public static UserResponse fromEntity(User user) {
         if (user == null) return null;
@@ -37,13 +31,8 @@ public class UserResponse {
                 .id(user.getId())
                 .email(user.getEmail())
                 .fullName(user.getFullName())
-                .phone(user.getPhone())
-                .address(user.getAddress())
-                .heightCm(user.getHeightCm())
-                .weightKg(user.getWeightKg())
                 .avatarUrl(user.getAvatarUrl())
                 .roles(roleNames)
-                .createdAt(user.getCreatedAt())
                 .build();
     }
 }
