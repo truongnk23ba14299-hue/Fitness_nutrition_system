@@ -43,11 +43,12 @@ public class AdminProductService {
     }
 
     @Transactional
-    public ProductResponse update(Long id, ProductRequest req) {
+    public AdminProductResponse update(Long id, ProductRequest req) {
         Product product = findOrThrow(id);
         applyRequest(product, req);
         product.setUpdatedAt(LocalDateTime.now());
-        return ProductResponse.fromEntity(product);
+        // Minh Quang: API admin trả đủ thông tin dạng admin (tồn kho, trạng thái, thời gian)
+        return AdminProductResponse.fromEntity(productRepository.save(product));
     }
 
     @Transactional
