@@ -88,7 +88,7 @@ public class SecurityConfig {
                         // 4. PHÂN QUYỀN NỘI BỘ (ADMIN, STAFF, TRAINER)
                         // ==========================================================
                         // 4.1. Dành riêng cho ADMIN (Quản trị hệ thống, thiết bị, gói tập, sản phẩm)
-                        .requestMatchers("/api/admin/**").hasAnyRole("ADMIN", "RECEPTIONIST")
+                        .requestMatchers("/api/admin/**").hasAnyRole("ADMIN", "STAFF")
                         .requestMatchers(HttpMethod.POST, "/api/equipments/**").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.PUT, "/api/equipments/**").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.DELETE, "/api/equipments/**").hasRole("ADMIN")
