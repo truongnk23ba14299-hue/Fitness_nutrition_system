@@ -1,10 +1,13 @@
 package com.fitness.controller;
 
 import com.fitness.dto.TrainerResponse;
+import com.fitness.dto.TrainerScheduleResponse;
 import com.fitness.service.TrainerService;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @RestController
@@ -46,5 +49,22 @@ public class TrainerController {
             return ResponseEntity.notFound().build();
         }
         return ResponseEntity.ok(trainer);
+    }
+
+    /**
+     * API Endpoint: GET /api/trainers/{id}/schedule
+     * Lấy lịch bận / trống của PT theo ngày (mặc định hôm nay nếu không truyền ?date=YYYY-MM-DD)
+     *
+     * @param id ID của PT
+     * @param date (Tuỳ chọn) Ngày cần tra cứu lịch
+     * @return TrainerScheduleResponse chứa danh sách khung giờ làm việc và trạng thái bận/trống
+     */
+    @GetMapping("/{id}/schedule")
+    public ResponseEntity<TrainerScheduleResponse> getTrainerSchedule(
+            @PathVariable Long id,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date
+    ) {
+        TrainerScheduleResponse schedule = trainerService.getTrainerSchedule(id, date);
+        return ResponseEntity.ok(schedule);
     }
 }
