@@ -1,3 +1,55 @@
-.idea/
-**/target/
+# ==========================================
+# 1. FRONTEND (NodeJS / React / Vite)
+# ==========================================
+frontend/node_modules/
+node_modules/
+frontend/dist/
+frontend/dist-ssr/
+*.local
+
+# File log của npm
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Biến môi trường bí mật
+.env
+.env.development.local
+.env.test.local
+.env.production.local
+.env.local
+
+# ==========================================
+# 2. BACKEND (Java / Spring Boot / Maven)
+# ==========================================
+backend/target/
+target/
+*.class
 /backend/src/main/resources/application.properties
+# Log files
+*.log
+logs/
+
+# ==========================================
+# 3. CẤU HÌNH IDE & TRÌNH SOẠN THẢO
+# ==========================================
+.idea/
+*.iml
+.vscode/
+*.ipr
+*.iws
+.settings/
+.project
+.classpath
+bin/
+
+# ==========================================
+# 4. HỆ ĐIỀU HÀNH (Windows / macOS)
+# ==========================================
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+.DS_Store
+._*
