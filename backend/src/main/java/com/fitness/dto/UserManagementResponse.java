@@ -9,8 +9,5 @@ public record UserManagementResponse(
         String role,
         String status,
         String phone,
-        String address,
-        Double heightCm,
-        Double weightKg,
         LocalDateTime createdAt
 ) {}
