@@ -38,12 +38,10 @@ public class RegisterService {
 
         User savedUser = userRepository.save(user);
 
-        return new RegisterResponse(
-                savedUser.getId(),
+         return new RegisterResponse(
+                "Đăng ký tài khoản thành công!",
                 savedUser.getFullName(),
-                savedUser.getEmail(),
-                savedUser.getRole(),
-                savedUser.getCreatedAt()
+                savedUser.getEmail()
         );
     }
 }
