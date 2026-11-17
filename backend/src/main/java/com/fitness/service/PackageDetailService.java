@@ -1,6 +1,10 @@
 package com.fitness.service;
 
+import com.fitness.dto.AdminPackageResponse;
+import com.fitness.dto.PackageDeleteResponse;
 import com.fitness.dto.PackageDetailResponse;
+import com.fitness.dto.PackageStatisticsResponse;
+import com.fitness.dto.UpdatePackageRequest;
 import com.fitness.model.EnrollmentStatus;
 import com.fitness.model.WorkoutPackage;
 import com.fitness.repository.PackageEnrollmentRepository;
@@ -12,8 +16,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.math.BigDecimal;
-import java.util.LinkedHashMap;
-import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -32,7 +34,7 @@ public class PackageDetailService {
     }
 
     @Transactional
-    public WorkoutPackage updatePackage(Long id, WorkoutPackage request) {
+    public AdminPackageResponse updatePackage(Long id, UpdatePackageRequest request) {
         WorkoutPackage pkg = repository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(
                         HttpStatus.NOT_FOUND,
@@ -46,26 +48,24 @@ public class PackageDetailService {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Giá gói tập phải lớn hơn 0");
         }
         if (request.getDurationMonths() == null || request.getDurationMonths() <= 0) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Thời hạn gói tập phải lớn hơn 0");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Thời hạn gói tập phải lớn hơn 0 tháng");
         }
 
-        pkg.setTitle(request.getTitle());
+        pkg.setTitle(request.getTitle().trim());
         pkg.setPrice(request.getPrice());
         pkg.setDurationMonths(request.getDurationMonths());
-        pkg.setDescription(request.getDescription());
-        pkg.setImageUrl(request.getImageUrl());
-        if (request.getIsActive() != null) {
-            pkg.setIsActive(request.getIsActive());
-        }
-        pkg.setBenefits(request.getBenefits());
-        pkg.setScheduleDetails(request.getScheduleDetails());
-        pkg.setTrainerInfo(request.getTrainerInfo());
+        if (request.getDescription() != null) pkg.setDescription(request.getDescription());
+        if (request.getImageUrl() != null) pkg.setImageUrl(request.getImageUrl());
+        if (request.getIsActive() != null) pkg.setIsActive(request.getIsActive());
+        if (request.getBenefits() != null) pkg.setBenefits(request.getBenefits());
+        if (request.getScheduleDetails() != null) pkg.setScheduleDetails(request.getScheduleDetails());
+        if (request.getTrainerInfo() != null) pkg.setTrainerInfo(request.getTrainerInfo());
 
-        return repository.save(pkg);
+        return AdminPackageResponse.fromEntity(repository.save(pkg));
     }
 
     @Transactional
-    public Map<String, Object> deletePackage(Long id) {
+    public PackageDeleteResponse deletePackage(Long id) {
         WorkoutPackage pkg = repository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(
                         HttpStatus.NOT_FOUND,
@@ -75,13 +75,11 @@ public class PackageDetailService {
         pkg.setIsActive(false);
         repository.save(pkg);
 
-        Map<String, Object> result = new LinkedHashMap<>();
-        result.put("message", "Đã ẩn/xóa gói tập thành công");
-        result.put("packageId", id);
-        return result;
+        return new PackageDeleteResponse("Đã ẩn/xóa gói tập thành công", id);
     }
 
-    public Map<String, Object> getPackageStatistics(Long id) {
+    @Transactional(readOnly = true)
+    public PackageStatisticsResponse getPackageStatistics(Long id) {
         WorkoutPackage pkg = repository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(
                         HttpStatus.NOT_FOUND,
@@ -91,12 +89,12 @@ public class PackageDetailService {
         long activeStudents = enrollmentRepository.countByWorkoutPackageIdAndStatus(id, EnrollmentStatus.ACTIVE);
         long totalEnrollments = enrollmentRepository.countByWorkoutPackageId(id);
 
-        Map<String, Object> stats = new LinkedHashMap<>();
-        stats.put("packageId", pkg.getId());
-        stats.put("packageTitle", pkg.getTitle());
-        stats.put("isActive", pkg.getIsActive());
-        stats.put("activeStudents", activeStudents);
-        stats.put("totalEnrollments", totalEnrollments);
-        return stats;
+        return new PackageStatisticsResponse(
+                pkg.getId(),
+                pkg.getTitle(),
+                pkg.getIsActive(),
+                activeStudents,
+                totalEnrollments
+        );
     }
 }

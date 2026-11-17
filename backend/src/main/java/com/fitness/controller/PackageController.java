@@ -1,8 +1,11 @@
 package com.fitness.controller;
 
+import com.fitness.dto.AdminPackageResponse;
+import com.fitness.dto.PackageDeleteResponse;
 import com.fitness.dto.PackageDetailResponse;
 import com.fitness.dto.PackageResponse;
-import com.fitness.model.WorkoutPackage;
+import com.fitness.dto.PackageStatisticsResponse;
+import com.fitness.dto.UpdatePackageRequest;
 import com.fitness.service.PackageDetailService;
 import com.fitness.service.PackageService;
 import lombok.RequiredArgsConstructor;
@@ -31,21 +34,21 @@ public class PackageController {
     }
 
     @GetMapping("/api/packages/{id}/statistics")
-    public ResponseEntity<?> getPackageStatistics(@PathVariable Long id) {
+    public ResponseEntity<PackageStatisticsResponse> getPackageStatistics(@PathVariable Long id) {
         return ResponseEntity.ok(packageDetailService.getPackageStatistics(id));
     }
 
     @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/api/admin/packages/{id}")
-    public ResponseEntity<WorkoutPackage> updatePackage(
+    public ResponseEntity<AdminPackageResponse> updatePackage(
             @PathVariable Long id,
-            @RequestBody WorkoutPackage request) {
+            @RequestBody UpdatePackageRequest request) {
         return ResponseEntity.ok(packageDetailService.updatePackage(id, request));
     }
 
     @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/api/admin/packages/{id}")
-    public ResponseEntity<?> deletePackage(@PathVariable Long id) {
+    public ResponseEntity<PackageDeleteResponse> deletePackage(@PathVariable Long id) {
         return ResponseEntity.ok(packageDetailService.deletePackage(id));
     }
 }

@@ -7,6 +7,7 @@ public record EquipmentDetailResponse(
         String name,
         String brand,
         String imageUrl,
+        String videoUrl,
         String workoutGuide,
         String targetMuscle,
         LocalDateTime createdAt

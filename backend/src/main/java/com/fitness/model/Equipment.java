@@ -19,19 +19,22 @@ public class Equipment {
     private Long id;
 
     @Column(name = "name", nullable = false, length = 150)
-    private String name;              // Tên máy tập (Máy chạy bộ, Máy ép ngực...)
+    private String name;
 
     @Column(name = "brand", length = 100)
-    private String brand;             // Hãng sản xuất (Technogym, Life Fitness, Matrix...)
+    private String brand;
 
     @Column(name = "image_url", length = 500)
-    private String imageUrl;          // Hình ảnh máy tập
+    private String imageUrl;
+
+    @Column(name = "video_url", length = 500)
+    private String videoUrl;
 
     @Column(name = "workout_guide", columnDefinition = "TEXT", nullable = false)
-    private String workoutGuide;      // Hướng dẫn chi tiết cách tập / tư thế chuẩn
+    private String workoutGuide;
 
     @Column(name = "target_muscle", length = 100)
-    private String targetMuscle;      // Nhóm cơ tác động chính (Ngực, Đùi, Lưng, Cardio...)
+    private String targetMuscle;
 
     @CreationTimestamp
     @Column(name = "created_at", updatable = false)

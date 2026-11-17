@@ -10,6 +10,8 @@ public record EquipmentRequest(
 
         String imageUrl,
 
+        String videoUrl,
+
         @NotBlank(message = "Hướng dẫn tập luyện không được để trống")
         String workoutGuide,
 
