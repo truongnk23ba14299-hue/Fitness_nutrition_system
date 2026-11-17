@@ -98,18 +98,17 @@ public class UserService {
         userRepository.save(user);
     }
 
+     // 4. ADMIN: XEM DANH SÁCH USER (ĐÃ LỌC BỎ CÁC TRƯỜNG RIÊNG TƯ NHẠY CẢM)
     public List<UserManagementResponse> getAllUsersForAdmin(String role, String keyword) {
         List<User> users = userRepository.findAll();
 
         return users.stream()
-                // Lọc theo Role nếu có truyền (VD: ?role=CLIENT hoặc ?role=ROLE_CLIENT)
                 .filter(u -> {
                     if (role == null || role.isBlank()) return true;
                     String filterRole = role.trim().toUpperCase();
                     if (!filterRole.startsWith("ROLE_")) filterRole = "ROLE_" + filterRole;
                     return filterRole.equalsIgnoreCase(u.getRole());
                 })
-                // Tìm kiếm theo tên hoặc email
                 .filter(u -> {
                     if (keyword == null || keyword.isBlank()) return true;
                     String kw = keyword.trim().toLowerCase();
@@ -123,20 +122,17 @@ public class UserService {
                         u.getRole(),
                         u.getStatus() != null ? u.getStatus() : "ACTIVE",
                         u.getPhone(),
-                        u.getAddress(),
-                        u.getHeightCm(),
-                        u.getWeightKg(),
                         u.getCreatedAt()
                 ))
                 .toList();
     }
 
+    // 5. ADMIN: KHÓA / MỞ KHÓA USER
     @Transactional
     public UserManagementResponse updateUserStatus(Long id, UpdateUserStatusRequest request) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Không tìm thấy người dùng với ID: " + id));
 
-        // Không cho phép Admin tự khóa tài khoản Admin
         if ("ROLE_ADMIN".equalsIgnoreCase(user.getRole())) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Không thể khóa tài khoản Quản trị viên (ADMIN)!");
         }
@@ -151,9 +147,6 @@ public class UserService {
                 updated.getRole(),
                 updated.getStatus(),
                 updated.getPhone(),
-                updated.getAddress(),
-                updated.getHeightCm(),
-                updated.getWeightKg(),
                 updated.getCreatedAt()
         );
     }
