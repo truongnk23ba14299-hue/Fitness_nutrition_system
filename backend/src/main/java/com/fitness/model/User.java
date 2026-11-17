@@ -1,11 +1,16 @@
 package com.fitness.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.time.LocalDateTime;
 import java.util.Collection;
@@ -29,6 +34,9 @@ public class User implements UserDetails {
     @Column(nullable = false, unique = true, length = 150)
     private String email;
 
+    // BẢO MẬT: CHẶN TUYỆT ĐỐI KHÔNG CHO PHÉP XUẤT MẬT KHẨU RA JSON
+    @JsonIgnore
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     @Column(name = "password_hash", nullable = false)
     private String password;
 
