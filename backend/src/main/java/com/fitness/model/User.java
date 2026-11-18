@@ -9,9 +9,6 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonProperty;
-
 import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
@@ -46,21 +43,37 @@ public class User implements UserDetails {
     @Column(name = "status", length = 30)
     @Builder.Default
     private String status = "ACTIVE";
-    private String phone;
-    private String address;
 
-    @Column(name = "height_cm")
+    @Column(length = 20)
+    private String phone;
+
+    @Column(length = 255)
+    private String address;
+    @Column(name = "height_cm", columnDefinition = "NUMERIC(5,2)")
     private Double heightCm;
 
-    @Column(name = "weight_kg")
+    @Column(name = "weight_kg", columnDefinition = "NUMERIC(5,2)")
     private Double weightKg;
 
-    @Column(name = "avatar_url")
+    @Column(name = "avatar_url", columnDefinition = "TEXT")
     private String avatarUrl;
+
+    @Column(name = "gender", length = 10)
+    private String gender; // MALE, FEMALE, OTHER
+
+    @Column(name = "date_of_birth")
+    private java.time.LocalDate dateOfBirth;
+
+    @Column(name = "medical_note", columnDefinition = "TEXT")
+    private String medicalNote;
     
     @CreationTimestamp
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
+
+    @UpdateTimestamp
+    @Column(name = "updated_at")
+    private LocalDateTime updatedAt;
 
     // === Spring Security UserDetails Implementation ===
 

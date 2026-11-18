@@ -16,6 +16,7 @@ import java.time.LocalDateTime;
 @Check(constraints = "stock_quantity >= 0 AND price > 0")
 @Getter
 @Setter
+
 public class Product {
 
     public enum ProductStatus{
@@ -50,7 +51,7 @@ public class Product {
     @Column(name = "weight_kg", precision = 8, scale = 2)
     private BigDecimal weightKg;
 
-    @Column(name = "image_url")
+    @Column(name = "image_url",columnDefinition = "TEXT")
     private String imageUrl;
 
     @Enumerated(EnumType.STRING)

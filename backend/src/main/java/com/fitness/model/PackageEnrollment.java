@@ -60,6 +60,33 @@ public class PackageEnrollment {
     @Column(name = "notes", columnDefinition = "TEXT")
     private String notes;
 
+    @Column(name = "subtotal", precision = 12, scale = 2)
+    private java.math.BigDecimal subtotal;
+
+    @Column(name = "discount_amount", precision = 12, scale = 2)
+    private java.math.BigDecimal discountAmount;
+
+    @Column(name = "voucher_code", length = 50)
+    private String voucherCode;
+
+    @Column(name = "payment_method", length = 30)
+    private String paymentMethod; // VIETQR, COD, CASH
+
+    // Quản lý số buổi tập PT đi kèm trong gói tập
+    @Column(name = "pt_sessions_total")
+    @Builder.Default
+    private Integer ptSessionsTotal = 0;
+
+    @Column(name = "pt_sessions_remaining")
+    @Builder.Default
+    private Integer ptSessionsRemaining = 0;
+    // Quản lý bảo lưu gói tập
+    @Column(name = "freeze_start")
+    private LocalDate freezeStart;
+
+    @Column(name = "freeze_end")
+    private LocalDate freezeEnd;
+
     // Thời điểm tạo bản ghi đăng ký, được Hibernate tự động thiết lập
     @CreationTimestamp
     @Column(name = "created_at", updatable = false)

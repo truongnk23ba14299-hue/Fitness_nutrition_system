@@ -24,7 +24,7 @@ public class Equipment {
     @Column(name = "brand", length = 100)
     private String brand;
 
-    @Column(name = "image_url", length = 500)
+    @Column(name = "image_url", columnDefinition = "TEXT")
     private String imageUrl;
 
     @Column(name = "video_url", length = 500)

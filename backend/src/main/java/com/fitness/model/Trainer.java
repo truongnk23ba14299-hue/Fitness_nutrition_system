@@ -1,19 +1,34 @@
 package com.fitness.model;
 
 import jakarta.persistence.*;
+import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
+
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "trainers")
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class Trainer {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    // Liên kết 1-1 với tài khoản người dùng đăng nhập có role ROLE_TRAINER
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", unique = true)
+    private User user;
+
     @Column(name = "full_name", nullable = false, length = 100)
     private String fullName;
 
-    @Column(name = "avatar_url", length = 255)
+    @Column(name = "avatar_url", columnDefinition = "TEXT")
     private String avatarUrl;
 
     @Column(name = "bio", columnDefinition = "TEXT")
@@ -23,90 +38,33 @@ public class Trainer {
     private Integer experienceYears;
 
     @Column(name = "rating")
-    private Double rating;
+    @Builder.Default
+    private Double rating = 5.0;
 
     @Column(name = "specialty", length = 100)
     private String specialty;
 
     @Column(name = "is_active")
+    @Builder.Default
     private Boolean isActive = true;
 
-    public Trainer() {
-    }
+    @CreationTimestamp
+    @Column(name = "created_at", updatable = false)
+    private LocalDateTime createdAt;
 
+    @UpdateTimestamp
+    @Column(name = "updated_at")
+    private LocalDateTime updatedAt;
+
+    // Giữ constructor tùy biến cũ để đảm bảo tương thích ngược 100%
     public Trainer(Long id, String fullName, String avatarUrl, String bio, Integer experienceYears, Double rating, String specialty, Boolean isActive) {
         this.id = id;
         this.fullName = fullName;
         this.avatarUrl = avatarUrl;
         this.bio = bio;
         this.experienceYears = experienceYears;
-        this.rating = rating;
+        this.rating = rating != null ? rating : 5.0;
         this.specialty = specialty;
         this.isActive = isActive != null ? isActive : true;
-    }
-
-    // Getters and Setters
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getFullName() {
-        return fullName;
-    }
-
-    public void setFullName(String fullName) {
-        this.fullName = fullName;
-    }
-
-    public String getAvatarUrl() {
-        return avatarUrl;
-    }
-
-    public void setAvatarUrl(String avatarUrl) {
-        this.avatarUrl = avatarUrl;
-    }
-
-    public String getBio() {
-        return bio;
-    }
-
-    public void setBio(String bio) {
-        this.bio = bio;
-    }
-
-    public Integer getExperienceYears() {
-        return experienceYears;
-    }
-
-    public void setExperienceYears(Integer experienceYears) {
-        this.experienceYears = experienceYears;
-    }
-
-    public Double getRating() {
-        return rating;
-    }
-
-    public void setRating(Double rating) {
-        this.rating = rating;
-    }
-
-    public String getSpecialty() {
-        return specialty;
-    }
-
-    public void setSpecialty(String specialty) {
-        this.specialty = specialty;
-    }
-
-    public Boolean getIsActive() {
-        return isActive;
-    }
-
-    public void setIsActive(Boolean isActive) {
-        this.isActive = isActive;
     }
 }

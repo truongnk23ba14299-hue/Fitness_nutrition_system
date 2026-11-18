@@ -57,6 +57,18 @@ public class Order {
     @Column(columnDefinition = "TEXT")
     private String note;
 
+    @Column(name = "subtotal", precision = 12, scale = 2)
+    private java.math.BigDecimal subtotal;
+
+    @Column(name = "discount_amount", precision = 12, scale = 2)
+    private java.math.BigDecimal discountAmount;
+
+    @Column(name = "voucher_code", length = 50)
+    private String voucherCode;
+
+    @Column(name = "payment_method", length = 30)
+    private String paymentMethod; // VIETQR, COD, CASH
+
     @Enumerated(EnumType.STRING)
     @Column(nullable= false, length= 30)
     private OrderStatus orderStatus = OrderStatus.PENDING;
