@@ -1,6 +1,7 @@
 package com.fitness.service;
 
 import com.fitness.dto.BookingResponse;
+import com.fitness.dto.TrainerRequest;
 import com.fitness.dto.TrainerResponse;
 import com.fitness.dto.TrainerScheduleResponse;
 import com.fitness.model.Booking;
@@ -111,5 +112,72 @@ public class TrainerService {
                 slots,
                 busyBookings
         );
+    }
+
+    // =========================================================================
+    // CÁC NGHIỆP VỤ QUẢN TRỊ DÀNH CHO ADMIN 
+    // =========================================================================
+
+    // 1. Admin: Xem danh sách HLV có tìm kiếm theo tên/chuyên môn và lọc isActive
+    @Transactional(readOnly = true)
+    public List<TrainerResponse> getAllTrainersForAdmin(String keyword, Boolean isActive) {
+        String kw = (keyword != null && !keyword.isBlank()) ? keyword.trim() : null;
+        return trainerRepository.searchTrainersForAdmin(kw, isActive)
+                .stream()
+                .map(TrainerResponse::fromEntity)
+                .toList();
+    }
+
+    // 2. Admin: Thêm mới HLV
+    @Transactional
+    public TrainerResponse createTrainer(TrainerRequest request) {
+        Trainer trainer = new Trainer();
+        trainer.setFullName(request.fullName().trim());
+        trainer.setSpecialty(request.specialty().trim());
+        trainer.setExperienceYears(request.experienceYears());
+        trainer.setBio(request.bio());
+        trainer.setAvatarUrl(request.avatarUrl());
+        trainer.setRating(request.rating() != null ? request.rating() : 5.0);
+        trainer.setIsActive(request.isActive() != null ? request.isActive() : true);
+
+        Trainer saved = trainerRepository.save(trainer);
+        return TrainerResponse.fromEntity(saved);
+    }
+
+    // 3. Admin: Cập nhật thông tin chuyên môn, số năm kinh nghiệm, bio
+    @Transactional
+    public TrainerResponse updateTrainer(Long id, TrainerRequest request) {
+        Trainer trainer = trainerRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND, 
+                        "Không tìm thấy Huấn luyện viên có ID: " + id));
+
+        trainer.setFullName(request.fullName().trim());
+        trainer.setSpecialty(request.specialty().trim());
+        trainer.setExperienceYears(request.experienceYears());
+        trainer.setBio(request.bio());
+        trainer.setAvatarUrl(request.avatarUrl());
+        if (request.rating() != null) {
+            trainer.setRating(request.rating());
+        }
+        if (request.isActive() != null) {
+            trainer.setIsActive(request.isActive());
+        }
+
+        Trainer updated = trainerRepository.save(trainer);
+        return TrainerResponse.fromEntity(updated);
+    }
+
+    // 4. Admin: Kích hoạt hoặc Vô hiệu hóa PT (Bật / Tắt hoạt động)
+    @Transactional
+    public TrainerResponse updateTrainerStatus(Long id, Boolean isActive) {
+        Trainer trainer = trainerRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND, 
+                        "Không tìm thấy Huấn luyện viên có ID: " + id));
+
+        trainer.setIsActive(isActive);
+        Trainer updated = trainerRepository.save(trainer);
+        return TrainerResponse.fromEntity(updated);
     }
 }
