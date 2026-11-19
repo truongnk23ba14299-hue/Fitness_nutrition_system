@@ -16,6 +16,8 @@ public interface TrainerRepository extends JpaRepository<Trainer, Long> {
      */
     List<Trainer> findByIsActiveTrue();
 
+    java.util.Optional<Trainer> findByUser_Id(Long userId);
+
     /**
      * Lọc danh sách huấn luyện viên theo chuyên môn (specialty)
      */

@@ -3,6 +3,9 @@ package com.fitness.controller;
 import com.fitness.dto.BookPtRequest;
 import com.fitness.dto.BookPtResponse;
 import com.fitness.dto.BookingResponse;
+import com.fitness.dto.ReviewRequest;
+import com.fitness.dto.ReviewResponse;
+import com.fitness.service.TrainerBookingService;
 import com.fitness.service.BookingService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
@@ -18,9 +21,11 @@ import java.util.List;
 public class BookingController {
 
     private final BookingService bookingService;
+    private final TrainerBookingService trainerBookingService;
 
-    public BookingController(BookingService bookingService) {
+    public BookingController(BookingService bookingService, TrainerBookingService trainerBookingService) {
         this.bookingService = bookingService;
+        this.trainerBookingService = trainerBookingService;
     }
 
     // POST /api/bookings/pt
@@ -51,6 +56,19 @@ public class BookingController {
         String email = getAuthenticatedEmail(authentication);
         BookingResponse response = bookingService.cancelBooking(id, email);
         return ResponseEntity.ok(response);
+    }
+
+
+    // GET /api/bookings/{id}/review - học viên xem đánh giá buổi tập của mình
+    @GetMapping("/{id}/review")
+    public ResponseEntity<ReviewResponse> getBookingReview(@PathVariable Long id, Authentication authentication) {
+        return ResponseEntity.ok(trainerBookingService.getBookingReview(id, getAuthenticatedEmail(authentication)));
+    }
+
+    // POST /api/bookings/{id}/review - học viên đánh giá buổi tập đã hoàn thành
+    @PostMapping("/{id}/review")
+    public ResponseEntity<ReviewResponse> createReview(@PathVariable Long id, @Valid @RequestBody ReviewRequest request, Authentication authentication) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(trainerBookingService.createReview(id, request, getAuthenticatedEmail(authentication)));
     }
 
     private String getAuthenticatedEmail(Authentication authentication) {

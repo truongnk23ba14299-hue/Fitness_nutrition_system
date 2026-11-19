@@ -1,6 +1,10 @@
 package com.fitness.controller;
 
 import com.fitness.dto.BookingResponse;
+import com.fitness.dto.UpdateBookingStatusRequest;
+import com.fitness.dto.RescheduleBookingRequest;
+import com.fitness.service.TrainerBookingService;
+import jakarta.validation.Valid;
 import com.fitness.service.BookingService;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
@@ -16,9 +20,11 @@ import java.util.List;
 public class AdminBookingController {
 
     private final BookingService bookingService;
+    private final TrainerBookingService trainerBookingService;
 
-    public AdminBookingController(BookingService bookingService) {
+    public AdminBookingController(BookingService bookingService, TrainerBookingService trainerBookingService) {
         this.bookingService = bookingService;
+        this.trainerBookingService = trainerBookingService;
     }
 
     /**
@@ -46,5 +52,19 @@ public class AdminBookingController {
                 : null;
         List<BookingResponse> bookings = bookingService.getAdminBookings(status, trainerId, userId, date, email);
         return ResponseEntity.ok(bookings);
+    }
+
+    // PUT /api/admin/bookings/{id}/status
+    @PutMapping("/{id}/status")
+    public ResponseEntity<BookingResponse> updateBookingStatus(@PathVariable Long id,
+            @Valid @RequestBody UpdateBookingStatusRequest request, Authentication authentication) {
+        return ResponseEntity.ok(trainerBookingService.updateStatus(id, request, authentication.getName()));
+    }
+
+    // PUT /api/admin/bookings/{id}/reschedule
+    @PutMapping("/{id}/reschedule")
+    public ResponseEntity<BookingResponse> rescheduleBooking(@PathVariable Long id,
+            @Valid @RequestBody RescheduleBookingRequest request, Authentication authentication) {
+        return ResponseEntity.ok(trainerBookingService.reschedule(id, request, authentication.getName()));
     }
 }

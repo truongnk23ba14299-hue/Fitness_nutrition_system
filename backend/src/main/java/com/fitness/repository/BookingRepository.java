@@ -55,4 +55,9 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
     @EntityGraph(attributePaths = {"user", "trainer"})
     List<Booking> findAllByOrderByBookingDateTimeDesc();
 
+    List<Booking> findByTrainer_IdOrderByBookingDateTimeAsc(Long trainerId);
+
+    boolean existsByTrainer_IdAndBookingDateTimeAndStatusInAndIdNot(
+            Long trainerId, LocalDateTime bookingDateTime, Collection<String> statuses, Long id);
+
 }

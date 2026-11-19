@@ -8,6 +8,7 @@ import com.fitness.model.Booking;
 import com.fitness.model.Trainer;
 import com.fitness.repository.BookingRepository;
 import com.fitness.repository.TrainerRepository;
+import com.fitness.repository.TrainerBlockedSlotRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,10 +26,13 @@ public class TrainerService {
 
     private final TrainerRepository trainerRepository;
     private final BookingRepository bookingRepository;
+    private final TrainerBlockedSlotRepository blockedSlotRepository;
 
-    public TrainerService(TrainerRepository trainerRepository, BookingRepository bookingRepository) {
+    public TrainerService(TrainerRepository trainerRepository, BookingRepository bookingRepository,
+                          TrainerBlockedSlotRepository blockedSlotRepository) {
         this.trainerRepository = trainerRepository;
         this.bookingRepository = bookingRepository;
+        this.blockedSlotRepository = blockedSlotRepository;
     }
 
     // Lấy danh sách PT, chỉ lấy PT đang hoạt động
@@ -88,15 +92,22 @@ public class TrainerService {
         Set<LocalTime> bookedHours = bookings.stream()
                 .map(b -> b.getBookingDateTime().toLocalTime().withMinute(0).withSecond(0).withNano(0))
                 .collect(Collectors.toSet());
+        Set<LocalTime> blockedHours = blockedSlotRepository
+                .findByTrainer_IdOrderBySlotStartAsc(trainerId).stream()
+                .filter(slot -> slot.getSlotStart().toLocalDate().equals(targetDate))
+                .map(slot -> slot.getSlotStart().toLocalTime().withMinute(0).withSecond(0).withNano(0))
+                .collect(Collectors.toSet());
 
         List<TrainerScheduleResponse.ScheduleSlot> slots = standardStartTimes.stream()
                 .map(time -> {
                     boolean isBooked = bookedHours.contains(time);
+                    boolean isBlocked = blockedHours.contains(time);
+                    String status = isBooked ? "BOOKED" : (isBlocked ? "BLOCKED" : "AVAILABLE");
                     return new TrainerScheduleResponse.ScheduleSlot(
                             time,
                             time.plusHours(1),
-                            !isBooked,
-                            isBooked ? "BOOKED" : "AVAILABLE"
+                            !isBooked && !isBlocked,
+                            status
                     );
                 })
                 .toList();
