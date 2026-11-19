@@ -108,21 +108,29 @@ public class CheckInService {
         return CheckInResponse.fromEntity(saved);
     }
 
-    /**
+     /**
      * GET /api/checkins?date=YYYY-MM-DD&limit=N
-     * Lấy danh sách lượt điểm danh hôm nay hoặc N lượt gần nhất.
+     * 1. Nếu có date: Lấy danh sách điểm danh của ngày đó (phục vụ đếm tổng khách hôm nay)
+     * 2. Nếu không có date: Lấy N lượt check-in gần nhất (phục vụ Dashboard)
      */
     @Transactional(readOnly = true)
     public List<CheckInResponse> getCheckIns(LocalDate date, Integer limit) {
         if (date != null) {
             LocalDateTime start = date.atStartOfDay();
             LocalDateTime end = date.atTime(LocalTime.MAX);
-            return checkInRepository.findByCheckedInAtBetween(start, end)
-                    .stream()
+            List<CheckIn> list = checkInRepository.findByCheckedInAtBetween(start, end);
+
+            // Nếu người dùng có truyền thêm limit thì cắt theo limit, ngược lại trả về toàn bộ khách trong ngày
+            if (limit != null && limit > 0 && list.size() > limit) {
+                list = list.subList(0, limit);
+            }
+
+            return list.stream()
                     .map(CheckInResponse::fromEntity)
                     .toList();
         }
 
+        // Mặc định nếu không truyền gì thì lấy 10 lượt gần nhất
         int pageSize = (limit != null && limit > 0) ? limit : 10;
         return checkInRepository.findRecentCheckIns(PageRequest.of(0, pageSize))
                 .stream()

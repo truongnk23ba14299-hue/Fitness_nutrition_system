@@ -38,7 +38,7 @@ public class CheckInController {
     @GetMapping
     public ResponseEntity<List<CheckInResponse>> getCheckIns(
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date,
-            @RequestParam(required = false, defaultValue = "10") Integer limit) {
+            @RequestParam(required = false) Integer limit) {
         return ResponseEntity.ok(checkInService.getCheckIns(date, limit));
     }
 }
