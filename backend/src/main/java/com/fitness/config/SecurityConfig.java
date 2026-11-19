@@ -88,7 +88,6 @@ public class SecurityConfig {
                         // 4. PHÂN QUYỀN NỘI BỘ (ADMIN, STAFF, TRAINER)
                         // ==========================================================
                         // 4.1. Dành riêng cho ADMIN (Quản trị hệ thống, thiết bị, gói tập, sản phẩm)
-                        .requestMatchers("/api/admin/**").hasAnyRole("ADMIN", "STAFF")
                         .requestMatchers(HttpMethod.POST, "/api/equipments/**").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.PUT, "/api/equipments/**").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.DELETE, "/api/equipments/**").hasRole("ADMIN")
@@ -117,6 +116,13 @@ public class SecurityConfig {
                         // Public thông tin giới thiệu các PT ngoài trang chủ (/api/trainers số nhiều)
                         .requestMatchers(HttpMethod.GET, "/api/trainers/**").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/leads").permitAll()
+
+
+                        .requestMatchers(HttpMethod.GET, "/api/admin/vouchers").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.POST, "/api/admin/vouchers").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.PUT, "/api/admin/vouchers/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/api/admin/vouchers/**").hasRole("ADMIN")
+
 
                         // 7. Tất cả các request còn lại bắt buộc có Token
                         .anyRequest().authenticated()
