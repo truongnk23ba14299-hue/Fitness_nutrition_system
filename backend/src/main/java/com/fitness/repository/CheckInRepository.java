@@ -41,4 +41,7 @@ public interface CheckInRepository extends JpaRepository<CheckIn, Long> {
            "LEFT JOIN FETCH c.staff " +
            "ORDER BY c.checkedInAt DESC")
     List<CheckIn> findRecentCheckIns(Pageable pageable);
+
+    // 4. Lấy lượt check-in gần nhất của 1 học viên cụ thể
+    Optional<CheckIn> findTopByUserIdOrderByCheckedInAtDesc(Long userId);
 }

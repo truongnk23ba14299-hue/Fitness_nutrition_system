@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Data
 @Builder
@@ -14,9 +15,9 @@ import java.time.LocalDate;
 @AllArgsConstructor
 public class MemberLookupResponse {
 
-    // 1. Thông tin cá nhân hội viên (Khớp bảng users)
+    // 1. Thông tin cá nhân học viên (Khớp bảng users)
     private Long id;
-    private String memberCode;        // Mã định dạng chuẩn "FL-00007"
+    private String memberCode;           // Mã thẻ chuẩn "FL-00007"
     private String fullName;
     private String email;
     private String phone;
@@ -24,18 +25,25 @@ public class MemberLookupResponse {
     private String avatarUrl;
     private String gender;
     private LocalDate dateOfBirth;
-    private String userStatus;        // "ACTIVE" hoặc "LOCKED"
+    private String userStatus;           // "ACTIVE", "LOCKED"
 
-    // 2. Thông tin gói tập đang sử dụng (Khớp bảng package_enrollments + packages)
+    // 2. Chi tiết gói tập đang kích hoạt (Khớp bảng package_enrollments + packages)
     private Long enrollmentId;
     private Long packageId;
-    private String packageTitle;      // Tên gói tập (Ví dụ: "Gói VIP Thượng Hạng (12 Tháng)")
-    private BigDecimal packagePrice;  // Giá gói đã đăng ký
+    private String packageTitle;         // Tên gói tập (VD: Gói VIP Thượng Hạng)
+    private Integer durationMonths;      // Thời hạn gói (tháng)
+    private BigDecimal packagePrice;     // Giá tiền gói
     private LocalDate startDate;
     private LocalDate endDate;
-    private Integer remainingDays;    // Số ngày còn lại (>= 0: còn hạn, < 0: hết hạn, null: chưa có gói)
+    private Integer remainingDays;       // Số ngày còn hạn (âm nếu đã hết hạn, null nếu chưa có gói)
+    private Long trainerId;              // ID Huấn luyện viên kèm riêng (nếu có)
+    private String trainerName;          // Tên Huấn luyện viên kèm riêng (nếu có)
+    private String benefits;             // Quyền lợi gói tập
+    private String scheduleDetails;      // Lịch tập chi tiết
 
-    // 3. Trạng thái tổng hợp cho Lễ tân quầy (Khớp Badge trên UI)
-    // ACTIVE: Thẻ hợp lệ | EXPIRED: Thẻ hết hạn | NO_PACKAGE: Chưa mua gói | LOCKED: Tài khoản bị khóa
-    private String status;
+    // 3. Trạng thái thẻ & điều kiện check-in vào phòng tập
+    private boolean canCheckIn;          // true nếu thẻ hợp lệ còn hạn, tài khoản không bị khóa
+    private String status;               // "ACTIVE", "EXPIRED", "NO_PACKAGE", "LOCKED"
+    private LocalDateTime lastCheckInAt; // Thời gian điểm danh gần nhất (nếu có)
+    private String lastCheckInMethod;    // QR / MANUAL / SCANNER
 }
