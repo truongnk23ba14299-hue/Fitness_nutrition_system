@@ -94,7 +94,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.DELETE, "/api/equipments/**").hasRole("ADMIN")
 
                         // 4.2. Dành cho LỄ TÂN (Check-in, kiểm tra hội viên, thanh toán tại quầy)
-                        .requestMatchers("/api/staff/**").hasAnyRole("STAFF", "ADMIN")
+                        .requestMatchers("/api/checkins/**", "/api/staff/**").hasAnyRole("STAFF", "ADMIN")
 
                         // 4.3. Dành cho HUẤN LUYỆN VIÊN PT (Xem lịch dạy, quản lý học viên kèm riêng)
                         .requestMatchers("/api/trainer/**").hasAnyRole("TRAINER", "ADMIN")
