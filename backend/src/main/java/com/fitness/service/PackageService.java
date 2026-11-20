@@ -24,7 +24,10 @@ public class PackageService {
                 pkg.getPrice(),
                 pkg.getDurationMonths(),
                 pkg.getDescription(),
-                pkg.getImageUrl()
+                pkg.getImageUrl(),
+                pkg.getBenefits(),
+                pkg.getScheduleDetails(),
+                pkg.getTrainerInfo()
         )).collect(Collectors.toList());
     }
 }
