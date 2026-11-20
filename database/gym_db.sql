@@ -157,12 +157,25 @@ INSERT INTO order_items (order_id, product_id, product_name, quantity, unit_pric
 -- --------------------------------------------------------------------
 -- 8. NẠP MÃ GIẢM GIÁ (VOUCHERS)
 -- --------------------------------------------------------------------
-INSERT INTO vouchers (id, code, title, discount_type, discount_value, max_discount, min_order_value, scope, is_active, expiry_date) VALUES
-(1, 'NEWMEMBER', 'Ưu đãi Hội viên mới - Giảm 10%', 'PERCENT', 10, 300000, 300000, 'ALL', TRUE, '2027-12-31'),
-(2, 'VIP2026', 'Đặc quyền VIP - Giảm ngay 200K', 'FIXED', 200000, 200000, 1500000, 'ALL', TRUE, '2027-12-31'),
-(3, 'FITLIFE50', 'Trợ giá năng lượng - Giảm 50K', 'FIXED', 50000, 50000, 400000, 'ALL', TRUE, '2027-12-31'),
-(4, 'SUPPLEMENT15', 'Ưu đãi Dinh dưỡng - Giảm 15%', 'PERCENT', 15, 250000, 600000, 'PRODUCT', TRUE, '2027-12-31')
-ON CONFLICT (id) DO NOTHING;
+INSERT INTO vouchers (id, code, title, discount_type, discount_value, max_discount, min_order_value, scope, is_active, started_date, expiry_date, quantity, used_count) VALUES
+(1, 'NEWMEMBER', 'Ưu đãi Hội viên mới - Giảm 10%', 'PERCENT', 10, 300000, 300000, 'ALL', TRUE, CURRENT_TIMESTAMP, '2027-12-31 23:59:59', 100, 0),
+(2, 'VIP2026', 'Đặc quyền VIP - Giảm ngay 200K', 'FIXED', 200000, 200000, 1500000, 'ALL', TRUE, CURRENT_TIMESTAMP, '2027-12-31 23:59:59', 100, 0),
+(3, 'FITLIFE50', 'Trợ giá năng lượng - Giảm 50K', 'FIXED', 50000, 50000, 400000, 'ALL', TRUE, CURRENT_TIMESTAMP, '2027-12-31 23:59:59', 100, 0),
+(4, 'SUPPLEMENT15', 'Ưu đãi Dinh dưỡng - Giảm 15%', 'PERCENT', 15, 250000, 600000, 'PRODUCT', TRUE, CURRENT_TIMESTAMP, '2027-12-31 23:59:59', 100, 0)
+ON CONFLICT (id) DO UPDATE SET 
+    code = EXCLUDED.code,
+    title = EXCLUDED.title,
+    discount_type = EXCLUDED.discount_type,
+    discount_value = EXCLUDED.discount_value,
+    max_discount = EXCLUDED.max_discount,
+    min_order_value = EXCLUDED.min_order_value,
+    scope = EXCLUDED.scope,
+    is_active = EXCLUDED.is_active,
+    started_date = EXCLUDED.started_date,
+    expiry_date = EXCLUDED.expiry_date,
+    quantity = EXCLUDED.quantity,
+    used_count = EXCLUDED.used_count;
+
 SELECT setval('vouchers_id_seq', (SELECT COALESCE(MAX(id), 1) FROM vouchers));
 
 -- --------------------------------------------------------------------
