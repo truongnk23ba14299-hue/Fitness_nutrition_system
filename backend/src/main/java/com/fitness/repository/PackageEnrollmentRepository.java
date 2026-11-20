@@ -16,6 +16,12 @@ public interface PackageEnrollmentRepository extends JpaRepository<PackageEnroll
 
     List<PackageEnrollment> findByUserIdOrderByCreatedAtDesc(Long userId);
 
+    @Query("SELECT e FROM PackageEnrollment e " +
+           "JOIN FETCH e.workoutPackage " +
+           "WHERE e.user.id = :userId " +
+           "ORDER BY e.createdAt DESC")
+    List<PackageEnrollment> findMyEnrollmentsWithPackage(@Param("userId") Long userId);
+
     List<PackageEnrollment> findByStatus(EnrollmentStatus status);
 
     boolean existsByUserIdAndStatus(Long userId, EnrollmentStatus status);

@@ -121,6 +121,10 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST, "/api/vouchers/validate").permitAll()
 
 
+                        // Hóa đơn thanh toán tập trung của học viên
+                        .requestMatchers("/api/payments/**").authenticated()
+
+                        .requestMatchers("/api/admin/**").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.GET, "/api/admin/vouchers").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.POST, "/api/admin/vouchers").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.PUT, "/api/admin/vouchers/**").hasRole("ADMIN")
