@@ -116,6 +116,9 @@ public class SecurityConfig {
                         // Public thông tin giới thiệu các PT ngoài trang chủ (/api/trainers số nhiều)
                         .requestMatchers(HttpMethod.GET, "/api/trainers/**").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/leads").permitAll()
+                        // Cho phép xem danh sách voucher & kiểm tra mã voucher công khai (hoặc cho mọi đối tượng đã đăng nhập)
+                        .requestMatchers(HttpMethod.GET, "/api/vouchers/**").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/vouchers/validate").permitAll()
 
 
                         .requestMatchers(HttpMethod.GET, "/api/admin/vouchers").hasRole("ADMIN")
@@ -133,7 +136,12 @@ public class SecurityConfig {
         return http.build();
     }
 
-
+    /**
+     * Cấu hình CORS (Cross-Origin Resource Sharing):
+     * - Mục đích: Cho phép Frontend (chạy ở cổng 5173 hoặc domain khác) có thể gửi request,
+     *   kèm Token JWT và các method HTTP tới Backend (cổng 8080) mà không bị trình duyệt chặn.
+     * - Tự động được Spring Security áp dụng qua cấu hình .cors(Customizer.withDefaults())
+     */
      @Bean
     public org.springframework.web.cors.CorsConfigurationSource corsConfigurationSource() {
         org.springframework.web.cors.CorsConfiguration configuration = new org.springframework.web.cors.CorsConfiguration();
