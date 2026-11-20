@@ -15,6 +15,7 @@ public record VoucherResponse (
     BigDecimal maxDiscount,
     Integer quantity,
     Integer usedCount,
+    String scope,
     Boolean active,
     LocalDateTime startDate,
     LocalDateTime expiryDate
@@ -32,6 +33,7 @@ public record VoucherResponse (
                 v.getMaxDiscount(),
                 v.getQuantity(),
                 v.getUsedCount(),
+                v.getScope(),
                 v.getIsActive(),
                 v.getStartDate(),
                 v.getExpiryDate()
