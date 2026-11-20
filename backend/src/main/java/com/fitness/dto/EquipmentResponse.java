@@ -5,5 +5,6 @@ public record EquipmentResponse(
         String name,
         String brand,
         String imageUrl,
-        String targetMuscle
+        String targetMuscle,
+        String workoutGuide
 ) {}
