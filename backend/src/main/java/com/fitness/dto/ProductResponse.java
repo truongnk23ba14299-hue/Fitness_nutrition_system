@@ -8,7 +8,9 @@ public record ProductResponse(
         String name,
         String description,
         String brand,
-        BigDecimal price
+        BigDecimal price,
+        String imageUrl,
+        String category
 ){
     public static ProductResponse fromEntity(Product p){
         return new ProductResponse(
@@ -16,7 +18,9 @@ public record ProductResponse(
                 p.getName(),
                 p.getDescription(),
                 p.getBrand(),
-                p.getPrice()
+                p.getPrice(),
+                p.getImageUrl(),
+                p.getCategory()
         );
     }
 }
