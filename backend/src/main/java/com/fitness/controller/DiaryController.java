@@ -26,9 +26,12 @@ public class DiaryController {
     @GetMapping
     public ResponseEntity<List<DiaryEntryResponse>> getDiaryByDate(
             Authentication authentication,
-            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date
+            @RequestParam(required = false)
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date
     ) {
-        return ResponseEntity.ok(diaryService.getDiaryByDate(authentication.getName(), date));
+        return ResponseEntity.ok(
+                diaryService.getDiaryByDate(authentication.getName(), date)
+        );
     }
 
     @PostMapping
@@ -46,6 +49,8 @@ public class DiaryController {
             @PathVariable Long id
     ) {
         diaryService.deleteDiaryEntry(authentication.getName(), id);
-        return ResponseEntity.ok(Map.of("message", "Đã xóa dòng nhật ký thành công"));
+        return ResponseEntity.ok(
+                Map.of("message", "Xóa nhật ký thành công")
+        );
     }
 }
