@@ -41,7 +41,7 @@ public class DiaryController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity> deleteDiaryEntry(
+    public ResponseEntity<Map<String, String>> deleteDiaryEntry(
             Authentication authentication,
             @PathVariable Long id
     ) {
