@@ -33,13 +33,13 @@ public class SecurityConfig {
         return new BCryptPasswordEncoder();
     }
 
-    // 2. Tìm user theo email (Đánh dấu @Primary để ưu tiên)
+    // 2. Tìm user theo email hoặc Username(Đánh dấu @Primary để ưu tiên)
     @Bean
     @Primary
     public UserDetailsService userDetailsService(UserRepository userRepository) {
-        return username -> userRepository.findByEmail(username)
+        return input -> userRepository.findByEmailIgnoreCaseOrUsernameIgnoreCase(input, input)
                 .orElseThrow(() -> new UsernameNotFoundException(
-                        "Không tìm thấy người dùng với email: " + username));
+                        "Không tìm thấy người dùng với tài khoản: " + input));
     }
 
     // 3. Provider xác thực bằng email + mật khẩu
@@ -77,8 +77,8 @@ public class SecurityConfig {
                         // 1. Preflight requests (CORS)
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
 
-                        // 2. Auth: Đăng ký & Đăng nhập không cần Token
-                        .requestMatchers(HttpMethod.POST, "/api/auth/register", "/api/auth/login").permitAll()
+                        // 2. Auth: Đăng ký ,Đăng nhập & Google OAuth không cần Token
+                        .requestMatchers(HttpMethod.POST, "/api/auth/register", "/api/auth/login","/api/auth/google").permitAll()
                         .requestMatchers("/api/auth/me").authenticated()
 
                         // 3. User Profile: Bắt buộc đăng nhập

@@ -31,15 +31,15 @@ ALTER TABLE package_enrollments DROP CONSTRAINT IF EXISTS package_enrollments_st
 -- 1. NẠP BẢNG USERS (Chuẩn hóa 4 Role - Tổng cộng 8 tài khoản mẫu)
 -- Hash BCrypt cho '123456': $2a$10$S/Do9GNmyWs2/uz.oEQk2e4afTCVyozeyVoTbc2apA7wOE1A6U2te
 -- --------------------------------------------------------------------
-INSERT INTO users (id, full_name, email, password_hash, role, phone, address, height_cm, weight_kg, status) VALUES
-(1, 'Nguyễn Khắc Trường (Admin)', 'admin@gym.com', '$2a$10$S/Do9GNmyWs2/uz.oEQk2e4afTCVyozeyVoTbc2apA7wOE1A6U2te', 'ROLE_ADMIN', '0988111222', 'Hà Nội', 175.0, 72.0, 'ACTIVE'),
-(2, 'Nguyễn Thu Trang (Lễ tân)', 'staff@gym.com', '$2a$10$S/Do9GNmyWs2/uz.oEQk2e4afTCVyozeyVoTbc2apA7wOE1A6U2te', 'ROLE_STAFF', '0933221100', 'Hà Nội', 162.0, 48.0, 'ACTIVE'),
-(3, 'Trần Văn Hoàng (PT)', 'pt_hoang@gym.com', '$2a$10$S/Do9GNmyWs2/uz.oEQk2e4afTCVyozeyVoTbc2apA7wOE1A6U2te', 'ROLE_TRAINER', '0912345678', 'Hồ Chí Minh', 180.0, 80.0, 'ACTIVE'),
-(4, 'Lê Thị Mai (PT Yoga)', 'pt_mai@gym.com', '$2a$10$S/Do9GNmyWs2/uz.oEQk2e4afTCVyozeyVoTbc2apA7wOE1A6U2te', 'ROLE_TRAINER', '0922334455', 'Đà Nẵng', 165.0, 52.0, 'ACTIVE'),
-(5, 'Nguyễn Quốc Cường (PT Calisthenics)', 'pt_cuong@gym.com', '$2a$10$S/Do9GNmyWs2/uz.oEQk2e4afTCVyozeyVoTbc2apA7wOE1A6U2te', 'ROLE_TRAINER', '0933445566', 'Hà Nội', 178.0, 75.0, 'ACTIVE'),
-(6, 'Đỗ Hải Đăng (PT Classic)', 'pt_dang@gym.com', '$2a$10$S/Do9GNmyWs2/uz.oEQk2e4afTCVyozeyVoTbc2apA7wOE1A6U2te', 'ROLE_TRAINER', '0944556677', 'Hồ Chí Minh', 182.0, 85.0, 'ACTIVE'),
-(7, 'Cao Tuấn (Hội viên VIP)', 'caotuan@gmail.com', '$2a$10$S/Do9GNmyWs2/uz.oEQk2e4afTCVyozeyVoTbc2apA7wOE1A6U2te', 'ROLE_CLIENT', '0977889900', 'Hải Phòng', 170.0, 65.5, 'ACTIVE'),
-(8, 'Trần Minh Đức (Thành viên mới)', 'minhduc@gmail.com', '$2a$10$S/Do9GNmyWs2/uz.oEQk2e4afTCVyozeyVoTbc2apA7wOE1A6U2te', 'ROLE_CLIENT', '0966554433', 'Đà Nẵng', 172.0, 68.0, 'ACTIVE')
+INSERT INTO users (id, full_name, email, username, auth_provider, password_hash, role, phone, address, height_cm, weight_kg, status) VALUES
+(1, 'Nguyễn Khắc Trường (Admin)', 'admin@gym.com', 'admin', 'LOCAL', '$2a$10$S/Do9GNmyWs2/uz.oEQk2e4afTCVyozeyVoTbc2apA7wOE1A6U2te', 'ROLE_ADMIN', '0988111222', 'Hà Nội', 175.0, 72.0, 'ACTIVE'),
+(2, 'Nguyễn Thu Trang (Lễ tân)', 'staff@gym.com', 'staff', 'LOCAL', '$2a$10$S/Do9GNmyWs2/uz.oEQk2e4afTCVyozeyVoTbc2apA7wOE1A6U2te', 'ROLE_STAFF', '0933221100', 'Hà Nội', 162.0, 48.0, 'ACTIVE'),
+(3, 'Trần Văn Hoàng (PT)', 'pt_hoang@gym.com', 'pt_hoang', 'LOCAL', '$2a$10$S/Do9GNmyWs2/uz.oEQk2e4afTCVyozeyVoTbc2apA7wOE1A6U2te', 'ROLE_TRAINER', '0912345678', 'Hồ Chí Minh', 180.0, 80.0, 'ACTIVE'),
+(4, 'Lê Thị Mai (PT Yoga)', 'pt_mai@gym.com', 'pt_mai', 'LOCAL', '$2a$10$S/Do9GNmyWs2/uz.oEQk2e4afTCVyozeyVoTbc2apA7wOE1A6U2te', 'ROLE_TRAINER', '0922334455', 'Đà Nẵng', 165.0, 52.0, 'ACTIVE'),
+(5, 'Nguyễn Quốc Cường (PT Calisthenics)', 'pt_cuong@gym.com', 'pt_cuong', 'LOCAL', '$2a$10$S/Do9GNmyWs2/uz.oEQk2e4afTCVyozeyVoTbc2apA7wOE1A6U2te', 'ROLE_TRAINER', '0933445566', 'Hà Nội', 178.0, 75.0, 'ACTIVE'),
+(6, 'Đỗ Hải Đăng (PT Classic)', 'pt_dang@gym.com', 'pt_dang', 'LOCAL', '$2a$10$S/Do9GNmyWs2/uz.oEQk2e4afTCVyozeyVoTbc2apA7wOE1A6U2te', 'ROLE_TRAINER', '0944556677', 'Hồ Chí Minh', 182.0, 85.0, 'ACTIVE'),
+(7, 'Cao Tuấn (Hội viên VIP)', 'caotuan@gmail.com', 'caotuan', 'LOCAL', '$2a$10$S/Do9GNmyWs2/uz.oEQk2e4afTCVyozeyVoTbc2apA7wOE1A6U2te', 'ROLE_CLIENT', '0977889900', 'Hải Phòng', 170.0, 65.5, 'ACTIVE'),
+(8, 'Trần Minh Đức (Thành viên mới)', 'minhduc@gmail.com', 'minhduc', 'LOCAL', '$2a$10$S/Do9GNmyWs2/uz.oEQk2e4afTCVyozeyVoTbc2apA7wOE1A6U2te', 'ROLE_CLIENT', '0966554433', 'Đà Nẵng', 172.0, 68.0, 'ACTIVE')
 ON CONFLICT (id) DO NOTHING;
 SELECT setval('users_id_seq', (SELECT COALESCE(MAX(id), 1) FROM users));
 
@@ -249,3 +249,14 @@ INSERT INTO payments (id, invoice_no, payment_code, user_id, ref_type, ref_id, a
 (4, 'INV-ORD-3', 'FLORD3', 7, 'ORDER',      3, 520000.00,  'COD',    'PAID', 'COD',   NOW() - INTERVAL '1 day',   NOW() - INTERVAL '1 day')
 ON CONFLICT (id) DO NOTHING;
 SELECT setval('payments_id_seq', (SELECT COALESCE(MAX(id), 1) FROM payments));
+=======
+
+-- --------------------------------------------------------------------
+-- 16. NẠP thông báo mẫu (Notification)
+-- --------------------------------------------------------------------
+INSERT INTO notifications (user_id, type, severity, title, message, link, is_read, created_at)
+VALUES 
+(7, 'BOOKING', 'INFO', 'Nhắc lịch tập PT ngày mai', 'Bạn có ca tập Squat cùng HLV Hoàng lúc 09:00.', '/client/my-bookings', false, NOW()),
+(7, 'ENROLLMENT', 'WARNING', 'Gói tập sắp hết hạn', 'Gói tập 6 tháng của bạn chỉ còn 7 ngày hiệu lực.', '/client/my-packages', false, NOW()),
+(7, 'ORDER', 'INFO', 'Đơn hàng đã giao thành công', 'Đơn hàng Whey Gold Standard đã được giao tới bạn.', '/client/my-orders', true, NOW() - INTERVAL '1 day');
+>>>>>>> Stashed changes

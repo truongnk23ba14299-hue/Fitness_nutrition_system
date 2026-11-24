@@ -12,15 +12,26 @@ import java.util.Optional;
 @Repository
 public interface UserRepository extends JpaRepository<User, Long> {
 
-    /**
-     * Tìm kiếm người dùng dựa trên email.
-     */
+    // 1. Tìm user theo Email
     Optional<User> findByEmail(String email);
 
-    /**
-     * Kiểm tra xem email đã được đăng ký trong hệ thống chưa.
-     */
+    // 2. Tìm user theo Email không phân biệt hoa thường
+    Optional<User> findByEmailIgnoreCase(String email);
+
+    // 3. Tìm user theo Username không phân biệt hoa thường
+    Optional<User> findByUsernameIgnoreCase(String username);
+
+    // 4. Tìm kiếm linh hoạt: khớp Email HOẶC khớp Username (Dành cho chức năng Đăng nhập)
+    Optional<User> findByEmailIgnoreCaseOrUsernameIgnoreCase(String email, String username);
+
+    // 5. Tìm user theo mã định danh Google ID
+    Optional<User> findByGoogleId(String googleId);
+
+    // 6. Kiểm tra xem Email đã tồn tại chưa
     boolean existsByEmail(String email);
+
+    // 7. Kiểm tra xem Username đã có người dùng chưa
+    boolean existsByUsernameIgnoreCase(String username);
 
     /**
      * Tra cứu hội viên (ROLE_CLIENT) theo từ khóa

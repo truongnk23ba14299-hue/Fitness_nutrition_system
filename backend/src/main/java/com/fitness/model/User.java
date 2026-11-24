@@ -32,10 +32,20 @@ public class User implements UserDetails {
     @Column(nullable = false, unique = true, length = 150)
     private String email;
 
+    @Column(name = "username", unique = true, length = 60)
+    private String username;
+
+    @Column(name = "google_id", unique = true, length = 100)
+    private String googleId;
+
+    @Column(name = "auth_provider", length = 20)
+    @Builder.Default
+    private String authProvider = "LOCAL";
+
     // BẢO MẬT: CHẶN TUYỆT ĐỐI KHÔNG CHO PHÉP XUẤT MẬT KHẨU RA JSON
     @JsonIgnore
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
-    @Column(name = "password_hash", nullable = false)
+    @Column(name = "password_hash", nullable = true)
     private String password;
 
     @Column(nullable = false, length = 50)
@@ -72,9 +82,6 @@ public class User implements UserDetails {
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
 
-    @UpdateTimestamp
-    @Column(name = "updated_at")
-    private LocalDateTime updatedAt;
 
     // === Spring Security UserDetails Implementation ===
 
@@ -91,7 +98,11 @@ public class User implements UserDetails {
     public String getUsername() {
         return this.email;
     }
-
+    
+    public String getActualUsername() {
+        return this.username;
+    }
+    
     @Override
     public boolean isAccountNonExpired() {
         return true;
