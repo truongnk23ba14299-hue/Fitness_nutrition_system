@@ -8,13 +8,17 @@ import com.fitness.repository.TrainerRepository;
 import com.fitness.repository.UserRepository;
 import com.fitness.repository.WorkoutPlanRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.HashSet;
 import java.util.Locale;
+import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
@@ -70,46 +74,93 @@ public class WorkoutPlanService {
                 .endDate(request.getEndDate())
                 .build();
 
-        attachDaysAndExercises(plan, request.getDays());
+        attachDaysAndExercises(plan, request.getDays(), false);
         return toResponse(workoutPlanRepository.save(plan));
     }
 
     @Transactional
     public WorkoutPlanResponse updatePlan(String trainerEmail, Long planId, WorkoutPlanRequest request) {
-        User trainerUser = getUserByEmail(trainerEmail);
-        Trainer trainer = getOrCreateTrainerProfile(trainerUser);
+        User currentUser = userRepository.findByEmailIgnoreCaseOrUsernameIgnoreCase(trainerEmail, trainerEmail)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "User not found"));
 
         WorkoutPlan plan = workoutPlanRepository.findById(planId)
-                .orElseThrow(() -> new ResourceNotFoundException("Workout plan not found: " + planId));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Workout plan not found: " + planId));
 
-        if (plan.getTrainer() == null || !plan.getTrainer().getId().equals(trainer.getId())) {
-            throw new RuntimeException("Bạn không có quyền cập nhật giáo án này");
+        if (!isAdminRole(currentUser.getRole())) {
+            Trainer trainer = getOrCreateTrainerProfile(currentUser);
+            if (plan.getTrainer() == null || !plan.getTrainer().getId().equals(trainer.getId())) {
+                throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You do not have permission to update this workout plan");
+            }
         }
 
-        if (request.getClientId() != null && !request.getClientId().equals(plan.getClient().getId())) {
-            User newClient = userRepository.findById(request.getClientId())
-                    .orElseThrow(() -> new RuntimeException("Không tìm thấy học viên với id = " + request.getClientId()));
-            plan.setClient(newClient);
+        if (request.getStartDate() != null && request.getEndDate() != null
+                && request.getEndDate().isBefore(request.getStartDate())) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "End date must not be before start date");
+        }
+
+        if (request.getDays() != null) {
+            Set<Integer> seenDays = new HashSet<>();
+            for (WorkoutPlanDayRequest dayReq : request.getDays()) {
+                if (dayReq.getDayIndex() != null && !seenDays.add(dayReq.getDayIndex())) {
+                    throw new ResponseStatusException(
+                            HttpStatus.BAD_REQUEST,
+                            "Duplicate dayIndex: " + dayReq.getDayIndex()
+                    );
+                }
+            }
+        }
+
+        if (request.getClientId() != null) {
+            Long currentClientId = plan.getClient() != null ? plan.getClient().getId() : null;
+            if (!request.getClientId().equals(currentClientId)) {
+                User newClient = userRepository.findById(request.getClientId())
+                        .orElseThrow(() -> new ResponseStatusException(
+                                HttpStatus.NOT_FOUND,
+                                "Client not found: " + request.getClientId()
+                        ));
+                plan.setClient(newClient);
+            }
         }
 
         plan.setTitle(request.getTitle().trim());
-        plan.setGoal(request.getGoal());
+        plan.setGoal(request.getGoal() != null ? request.getGoal().trim() : null);
+
         if (request.getStatus() != null && !request.getStatus().isBlank()) {
-            plan.setStatus(normalizeStatus(request.getStatus()));
+            String normalizedStatus = normalizeStatus(request.getStatus());
+            if (normalizedStatus.length() > 15) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Status must not exceed 15 characters");
+            }
+            plan.setStatus(normalizedStatus);
         }
+
         plan.setStartDate(request.getStartDate());
         plan.setEndDate(request.getEndDate());
 
-        plan.getDays().clear();
-
+        if (plan.getDays() == null) {
+            plan.setDays(new ArrayList<>());
+        } else {
+            plan.getDays().clear();
+        }
         workoutPlanRepository.flush();
 
-        attachDaysAndExercises(plan, request.getDays());
+        attachDaysAndExercises(plan, request.getDays(), true);
 
         return toResponse(workoutPlanRepository.save(plan));
     }
 
-    private void attachDaysAndExercises(WorkoutPlan plan, List<WorkoutPlanDayRequest> dayRequests) {
+    private boolean isAdminRole(String role) {
+        if (role == null) {
+            return false;
+        }
+        String normalized = role.trim().toUpperCase(Locale.ROOT);
+        return "ADMIN".equals(normalized) || "ROLE_ADMIN".equals(normalized);
+    }
+
+    private void attachDaysAndExercises(
+            WorkoutPlan plan,
+            List<WorkoutPlanDayRequest> dayRequests,
+            boolean useHttpStatus
+    ) {
         if (dayRequests == null) {
             return;
         }
@@ -128,7 +179,9 @@ public class WorkoutPlanService {
                     Equipment equipment = null;
                     if (exReq.getEquipmentId() != null) {
                         equipment = equipmentRepository.findById(exReq.getEquipmentId())
-                                .orElseThrow(() -> new RuntimeException("Không tìm thấy thiết bị với id = " + exReq.getEquipmentId()));
+                                .orElseThrow(() -> useHttpStatus
+                                        ? new ResponseStatusException(HttpStatus.NOT_FOUND, "Equipment not found: " + exReq.getEquipmentId())
+                                        : new RuntimeException("Equipment not found: " + exReq.getEquipmentId()));
                     }
                     WorkoutPlanExercise ex = WorkoutPlanExercise.builder()
                             .workoutPlanDay(day)
@@ -148,7 +201,6 @@ public class WorkoutPlanService {
             plan.getDays().add(day);
         }
     }
-
     private String normalizeStatus(String status) {
         if (status == null || status.isBlank()) {
             return "ACTIVE";
