@@ -259,4 +259,4 @@ VALUES
 (7, 'BOOKING', 'INFO', 'Nhắc lịch tập PT ngày mai', 'Bạn có ca tập Squat cùng HLV Hoàng lúc 09:00.', '/client/my-bookings', false, NOW()),
 (7, 'ENROLLMENT', 'WARNING', 'Gói tập sắp hết hạn', 'Gói tập 6 tháng của bạn chỉ còn 7 ngày hiệu lực.', '/client/my-packages', false, NOW()),
 (7, 'ORDER', 'INFO', 'Đơn hàng đã giao thành công', 'Đơn hàng Whey Gold Standard đã được giao tới bạn.', '/client/my-orders', true, NOW() - INTERVAL '1 day');
->>>>>>> Stashed changes
+
