@@ -1,8 +1,11 @@
 package com.fitness.controller;
 
+import com.fitness.dto.BodyRecordRequest;
 import com.fitness.dto.BodyRecordResponse;
 import com.fitness.service.ProgressService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
@@ -26,6 +29,20 @@ public class ProgressController {
     public ResponseEntity<List<BodyRecordResponse>> getMyRecords(Authentication authentication) {
         String email = authentication.getName();
         return ResponseEntity.ok(progressService.getMyRecords(email));
+    }
+
+    /**
+     * API Endpoint: POST /api/progress/my-records
+     * Học viên ghi nhận chỉ số cơ thể mới (cân, mỡ, cơ)
+     */
+    @PostMapping("/my-records")
+    public ResponseEntity<BodyRecordResponse> createMyRecord(
+            Authentication authentication,
+            @Valid @RequestBody BodyRecordRequest request
+    ) {
+        String email = authentication.getName();
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(progressService.createMyRecord(email, request));
     }
 
     /**
