@@ -6,8 +6,11 @@ import com.fitness.dto.VoucherResponse;
 import com.fitness.model.Voucher;
 import com.fitness.repository.VoucherRepository;
 import lombok.RequiredArgsConstructor;
+
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -129,5 +132,39 @@ public class VoucherService {
         if (val == null) return "0 ₫";
         NumberFormat nf = NumberFormat.getNumberInstance(new Locale("vi", "VN"));
         return nf.format(val) + " ₫";
+    }
+
+        /**
+     * 3. Kiểm tra + áp dụng + trừ 1 lượt Voucher ở tầng Server khi chốt đơn / gói tập / POS
+     * Trả về null nếu khách không nhập mã giảm giá.
+     */
+    @Transactional
+    public ValidateVoucherResponse applyAndConsumeVoucher(String rawCode, BigDecimal subtotal, String scope) {
+        if (rawCode == null || rawCode.isBlank()) {
+            return null;
+        }
+
+        ValidateVoucherResponse result = validateVoucher(new ValidateVoucherRequest(rawCode, subtotal, scope));
+        if (!result.valid() || result.voucher() == null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, result.message());
+        }
+
+        int updated = voucherRepository.incrementUsedCountIfAvailable(result.voucher().id());
+        if (updated == 0) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT,
+                    "Mã \"" + result.voucher().code() + "\" vừa hết lượt sử dụng!");
+        }
+        return result;
+    }
+
+    /**
+     * 4. Hoàn lại 1 lượt Voucher khi hủy đơn / hủy gói hoặc QR hết hạn
+     */
+    @Transactional
+    public void releaseVoucher(String rawCode) {
+        if (rawCode == null || rawCode.isBlank()) {
+            return;
+        }
+        voucherRepository.decrementUsedCount(rawCode.trim());
     }
 }

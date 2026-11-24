@@ -3,18 +3,23 @@ package com.fitness.service;
 import com.fitness.Exception.ResourceNotFoundException;
 import com.fitness.dto.AdminOrderResponse;
 import com.fitness.model.Order;
+import com.fitness.model.Payment;
 import com.fitness.repository.OrderRepository;
+import com.fitness.repository.PaymentRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
 public class AdminOrderService {
     private final OrderRepository orderRepository;
+    private final PaymentRepository paymentRepository;
+    private final SePayPaymentService sePayPaymentService;
+    private final VoucherService voucherService;
 
     // ==== Minh Quang: Admin quản lý xử lý đơn hàng của học viên ====
     // Dùng chung model Order của tuantinhte17-droid (confirm/ship/deliver/complete/cancel)
@@ -59,6 +64,37 @@ public class AdminOrderService {
         } catch (IllegalStateException e) {
             // Trả 400 thay vì 500 khi luồng chuyển trạng thái không hợp lệ
             throw new IllegalArgumentException(e.getMessage());
+        }
+
+        if (target == Order.OrderStatus.COMPLETED && order.getPaymentStatus() != Order.PaymentStatus.PAID) {
+            order.setPaymentStatus(Order.PaymentStatus.PAID);
+            var existingPaymentOpt = paymentRepository.findTopByRefTypeAndRefIdOrderByCreatedAtDesc("ORDER", order.getId());
+            if (existingPaymentOpt.isPresent()) {
+                Payment payment = existingPaymentOpt.get();
+                if (!"PAID".equals(payment.getStatus())) {
+                    payment.setStatus("PAID");
+                    payment.setPaidAt(LocalDateTime.now());
+                    paymentRepository.save(payment);
+                }
+            } else {
+                String method = order.getPaymentMethod() != null ? order.getPaymentMethod() : "COD";
+                sePayPaymentService.createImmediatePaidPayment(
+                        order.getUser(), "ORDER", order.getId(), order.getTotalAmount(), method, null);
+            }
+        }
+
+        if (target == Order.OrderStatus.CANCELLED) {
+            paymentRepository.findTopByRefTypeAndRefIdOrderByCreatedAtDesc("ORDER", order.getId())
+                    .ifPresent(payment -> {
+                        if ("PENDING".equals(payment.getStatus())) {
+                            payment.setStatus("CANCELLED");
+                            paymentRepository.save(payment);
+                        }
+                    });
+            order.setPaymentStatus(order.getPaymentStatus() == Order.PaymentStatus.PAID
+                    ? Order.PaymentStatus.REFUNDED
+                    : Order.PaymentStatus.UNPAID);
+            voucherService.releaseVoucher(order.getVoucherCode());
         }
 
         return AdminOrderResponse.fromEntity(orderRepository.save(order));

@@ -1,5 +1,6 @@
 package com.fitness.service;
 
+import com.fitness.dto.PaymentInfoResponse;
 import com.fitness.dto.PosSaleRequest;
 import com.fitness.dto.PosSaleResponse;
 import com.fitness.model.*;
@@ -15,6 +16,7 @@ import org.springframework.web.server.ResponseStatusException;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Locale;
 
 @Slf4j
 @Service
@@ -26,6 +28,8 @@ public class StaffPosService {
     private final PackageEnrollmentRepository packageEnrollmentRepository;
     private final CheckInRepository checkInRepository;
     private final PasswordEncoder passwordEncoder;
+    private final VoucherService voucherService;
+    private final SePayPaymentService sePayPaymentService;
 
     @Transactional
     public PosSaleResponse processPosSale(String staffEmail, PosSaleRequest request) {
@@ -47,7 +51,6 @@ public class StaffPosService {
         // 4. Tính toán thời hạn sử dụng
         LocalDate start = LocalDate.now();
         LocalDate end;
-        // Nếu là vé ngày (ID = 1 hoặc thời hạn 1 ngày) thì hết hạn vào cuối ngày hôm nay
         if (pkg.getId() == 1L || (pkg.getDurationMonths() != null && pkg.getDurationMonths() == 0)) {
             end = start;
         } else {
@@ -55,11 +58,23 @@ public class StaffPosService {
             end = start.plusMonths(months);
         }
 
-        // 5. Tính toán tài chính
-        BigDecimal subtotal = pkg.getPrice();
-        BigDecimal discount = request.discountAmount() != null ? request.discountAmount() : BigDecimal.ZERO;
-        BigDecimal total = request.totalPrice() != null ? request.totalPrice() : subtotal.subtract(discount).max(BigDecimal.ZERO);
-        String payment = (request.paymentMethod() != null && !request.paymentMethod().isBlank()) ? request.paymentMethod() : "CASH";
+        // 5. Tính toán tài chính & áp Voucher tại Server (KHÔNG tin discountAmount/totalPrice từ FE)
+        BigDecimal subtotal = pkg.getPrice() != null ? pkg.getPrice() : BigDecimal.ZERO;
+        BigDecimal discount = BigDecimal.ZERO;
+        String appliedVoucherCode = null;
+
+        var voucherRes = voucherService.applyAndConsumeVoucher(request.voucherCode(), subtotal, "PACKAGE");
+        if (voucherRes != null) {
+            discount = voucherRes.discountAmount();
+            appliedVoucherCode = voucherRes.voucher().code();
+        }
+        BigDecimal total = subtotal.subtract(discount).max(BigDecimal.ZERO);
+
+        String rawMethod = (request.paymentMethod() != null && !request.paymentMethod().isBlank())
+                ? request.paymentMethod().trim().toUpperCase(Locale.ROOT)
+                : "CASH";
+        String paymentMethod = "CASH".equals(rawMethod) ? "CASH" : "VIETQR";
+        boolean isVietQrPending = "VIETQR".equals(paymentMethod) && total.compareTo(BigDecimal.ZERO) > 0;
 
         // 6. Lưu hợp đồng gói tập (PackageEnrollment)
         PackageEnrollment enrollment = PackageEnrollment.builder()
@@ -68,19 +83,31 @@ public class StaffPosService {
                 .totalPrice(total)
                 .subtotal(subtotal)
                 .discountAmount(discount)
-                .voucherCode(request.voucherCode())
-                .paymentMethod(payment)
+                .voucherCode(appliedVoucherCode)
+                .paymentMethod(paymentMethod)
                 .startDate(start)
                 .endDate(end)
-                .status(EnrollmentStatus.ACTIVE)
+                .status(isVietQrPending ? EnrollmentStatus.PENDING_PAYMENT : EnrollmentStatus.ACTIVE)
                 .notes(request.notes() != null && !request.notes().isBlank() ? request.notes() : "Đăng ký tại quầy lễ tân (POS)")
                 .build();
 
         PackageEnrollment savedEnrollment = packageEnrollmentRepository.save(enrollment);
 
-        // 7. Tự động check-in nếu là vé ngày hoặc lễ tân tích chọn autoCheckIn
+        // 7. Ghi nhận thanh toán vào bảng payments
+        PaymentInfoResponse paymentInfo = null;
+        String invoiceCode;
+        if (isVietQrPending) {
+            paymentInfo = sePayPaymentService.createVietQrPayment(customer, "POS", savedEnrollment.getId(), total, staff);
+            invoiceCode = paymentInfo.invoiceNo();
+        } else {
+            Payment paid = sePayPaymentService.createImmediatePaidPayment(
+                    customer, "POS", savedEnrollment.getId(), total, paymentMethod, staff);
+            invoiceCode = paid.getInvoiceNo();
+        }
+
+        // 8. Chỉ tự động check-in khi đã thu tiền ngay (ACTIVE)
         boolean isCheckedIn = false;
-        if (Boolean.TRUE.equals(request.autoCheckIn()) || pkg.getId() == 1L) {
+        if (!isVietQrPending && (Boolean.TRUE.equals(request.autoCheckIn()) || pkg.getId() == 1L)) {
             CheckIn checkIn = CheckIn.builder()
                     .user(customer)
                     .method("MANUAL")
@@ -90,8 +117,6 @@ public class StaffPosService {
             isCheckedIn = true;
         }
 
-        // 8. Tạo mã hóa đơn POS (VD: POS-492102)
-        String invoiceCode = "POS-" + (System.currentTimeMillis() % 1000000);
         String memberCode = String.format("FL-%05d", customer.getId());
 
         return PosSaleResponse.builder()
@@ -106,9 +131,9 @@ public class StaffPosService {
                 .packageTitle(pkg.getTitle())
                 .subtotal(subtotal)
                 .discountAmount(discount)
-                .voucherCode(request.voucherCode())
+                .voucherCode(appliedVoucherCode)
                 .totalAmount(total)
-                .paymentMethod(payment)
+                .paymentMethod(paymentMethod)
                 .startDate(start)
                 .endDate(end)
                 .status(savedEnrollment.getStatus())
@@ -116,6 +141,7 @@ public class StaffPosService {
                 .staffName(staff.getFullName())
                 .isCheckedIn(isCheckedIn)
                 .createdAt(savedEnrollment.getCreatedAt() != null ? savedEnrollment.getCreatedAt() : LocalDateTime.now())
+                .payment(paymentInfo)
                 .build();
     }
 

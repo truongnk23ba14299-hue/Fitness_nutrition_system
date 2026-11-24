@@ -17,7 +17,6 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -54,17 +53,17 @@ public class AdminReportService {
         LocalDateTime endOfDay = LocalDate.now().atTime(23, 59, 59);
         long todayCheckIns = checkInRepository.findByCheckedInAtBetween(startOfDay, endOfDay).size();
 
-        // Doanh thu gói tập (loại trừ CANCELLED)
+        // Doanh thu gói tập (chỉ tính ACTIVE & EXPIRED, loại PENDING_PAYMENT và CANCELLED)
         var enrollments = enrollmentRepository.findAll();
         BigDecimal packageRev = enrollments.stream()
-                .filter(e -> e.getStatus() != EnrollmentStatus.CANCELLED)
+                .filter(this::isPaidEnrollment)
                 .map(e -> e.getTotalPrice() != null ? e.getTotalPrice() : BigDecimal.ZERO)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 
-        // Doanh thu shop (loại trừ CANCELLED)
+        // Doanh thu shop (loại CANCELLED và đơn VIETQR chưa PAID)
         var orders = orderRepository.findAll();
         BigDecimal productRev = orders.stream()
-                .filter(o -> o.getOrderStatus() != OrderStatus.CANCELLED)
+                .filter(this::isCountableOrder)
                 .map(o -> o.getTotalAmount() != null ? o.getTotalAmount() : BigDecimal.ZERO)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 
@@ -72,13 +71,13 @@ public class AdminReportService {
 
         // Doanh thu hôm nay
         BigDecimal todayPackageRev = enrollments.stream()
-                .filter(e -> e.getStatus() != EnrollmentStatus.CANCELLED)
+                .filter(this::isPaidEnrollment)
                 .filter(e -> e.getCreatedAt() != null && e.getCreatedAt().toLocalDate().isEqual(LocalDate.now()))
                 .map(e -> e.getTotalPrice() != null ? e.getTotalPrice() : BigDecimal.ZERO)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 
         BigDecimal todayProductRev = orders.stream()
-                .filter(o -> o.getOrderStatus() != OrderStatus.CANCELLED)
+                .filter(this::isCountableOrder)
                 .filter(o -> o.getCreatedAt() != null && o.getCreatedAt().toLocalDate().isEqual(LocalDate.now()))
                 .map(o -> o.getTotalAmount() != null ? o.getTotalAmount() : BigDecimal.ZERO)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
@@ -106,13 +105,13 @@ public class AdminReportService {
         LocalDate end = (to != null) ? to : LocalDate.now();
 
         var enrollments = enrollmentRepository.findAll().stream()
-                .filter(e -> e.getStatus() != EnrollmentStatus.CANCELLED)
+                .filter(this::isPaidEnrollment)
                 .filter(e -> e.getCreatedAt() != null)
                 .filter(e -> !e.getCreatedAt().toLocalDate().isBefore(start) && !e.getCreatedAt().toLocalDate().isAfter(end))
                 .toList();
 
         var orders = orderRepository.findAll().stream()
-                .filter(o -> o.getOrderStatus() != OrderStatus.CANCELLED)
+                .filter(this::isCountableOrder)
                 .filter(o -> o.getCreatedAt() != null)
                 .filter(o -> !o.getCreatedAt().toLocalDate().isBefore(start) && !o.getCreatedAt().toLocalDate().isAfter(end))
                 .toList();
@@ -127,7 +126,7 @@ public class AdminReportService {
 
         BigDecimal grandTotal = packageTotal.add(productTotal);
 
-        // Gom nhóm theo tháng (VD: "2026-11")
+        // Gom nhóm theo tháng (VD: "11/2026")
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MM/yyyy");
         Map<String, BigDecimal> packageByMonth = new TreeMap<>();
         Map<String, BigDecimal> productByMonth = new TreeMap<>();
@@ -162,5 +161,18 @@ public class AdminReportService {
                 .totalOrders(orders.size())
                 .dataPoints(points)
                 .build();
+    }
+
+    private boolean isPaidEnrollment(PackageEnrollment e) {
+        return e.getStatus() == EnrollmentStatus.ACTIVE || e.getStatus() == EnrollmentStatus.EXPIRED;
+    }
+
+    private boolean isCountableOrder(Order o) {
+        if (o.getOrderStatus() == OrderStatus.CANCELLED) return false;
+        // Đơn VIETQR chỉ tính doanh thu sau khi Webhook xác nhận PAID
+        if ("VIETQR".equalsIgnoreCase(o.getPaymentMethod())) {
+            return o.getPaymentStatus() == Order.PaymentStatus.PAID;
+        }
+        return true;
     }
 }
