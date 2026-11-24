@@ -29,5 +29,6 @@ public record PosSaleResponse(
         String notes,              // Ghi chú
         String staffName,          // Tên nhân viên lễ tân lập hóa đơn
         Boolean isCheckedIn,       // Đã tự động check-in vào tập luôn chưa
-        LocalDateTime createdAt    // Thời điểm xuất hóa đơn
+        LocalDateTime createdAt,    // Thời điểm xuất hóa đơn
+        PaymentInfoResponse payment  // Thông tin QR SePay nếu paymentMethod = VIETQR
 ) {}

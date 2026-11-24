@@ -1,4 +1,6 @@
 package com.fitness.dto;
+
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
@@ -6,8 +8,9 @@ import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import java.util.List;
 
-public record OrderRequest (
-    @NotEmpty(message= "Order must contain at least one product")
+@JsonIgnoreProperties(ignoreUnknown = true)
+public record OrderRequest(
+    @NotEmpty(message = "Order must contain at least one product")
     @Size(max = 50, message = "Order must not exceed 50")
     List<@Valid OrderItemRequest> items,
 
@@ -19,12 +22,17 @@ public record OrderRequest (
     @Pattern(regexp = "^(0|\\+84)\\d{9}$", message = "Phone number is invalid")
     String phone,
 
-    @NotBlank(message= "Shipping Address is required")
-    @Size(max = 500, message= "Address must not exceed 500 characters")
+    @NotBlank(message = "Shipping Address is required")
+    @Size(max = 500, message = "Address must not exceed 500 characters")
     String shippingAddress,
 
     @Size(max = 500, message = "Note must not exceed 500 characters")
-    String note
-){
+    String note,
 
+    @Size(max = 30, message = "Payment method must not exceed 30 characters")
+    String paymentMethod,
+
+    @Size(max = 50, message = "Voucher code must not exceed 50 characters")
+    String voucherCode
+) {
 }

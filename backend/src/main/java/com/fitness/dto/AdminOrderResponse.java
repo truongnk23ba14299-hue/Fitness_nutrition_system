@@ -1,7 +1,6 @@
 package com.fitness.dto;
 
 import com.fitness.model.Order;
-import com.fitness.model.OrderItem;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -19,8 +18,13 @@ public record AdminOrderResponse(
         BigDecimal totalAmount,
         Order.OrderStatus status,
         List<AdminOrderItemResponse> items,
-        LocalDateTime createdAt
-){
+        LocalDateTime createdAt,
+        BigDecimal subtotal,
+        BigDecimal discountAmount,
+        String voucherCode,
+        String paymentMethod,
+        Order.PaymentStatus paymentStatus
+) {
     public static AdminOrderResponse fromEntity(Order order) {
         return new AdminOrderResponse(
                 order.getId(),
@@ -36,7 +40,12 @@ public record AdminOrderResponse(
                 order.getItems().stream()
                         .map(AdminOrderItemResponse::fromEntity)
                         .toList(),
-                order.getCreatedAt()
+                order.getCreatedAt(),
+                order.getSubtotal(),
+                order.getDiscountAmount(),
+                order.getVoucherCode(),
+                order.getPaymentMethod(),
+                order.getPaymentStatus()
         );
     }
 }
