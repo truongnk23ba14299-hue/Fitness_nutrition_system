@@ -2,6 +2,7 @@
 -- ====================================================================
 TRUNCATE TABLE
     package_enrollments,
+    payments,
     products,
     equipments,
     trainers,
@@ -18,6 +19,9 @@ TRUNCATE TABLE
     meal_library,
     system_settings
 RESTART IDENTITY CASCADE;
+
+-- Gỡ CHECK constraint enum cũ (nếu có) để cho phép giá trị mới PENDING_PAYMENT
+ALTER TABLE package_enrollments DROP CONSTRAINT IF EXISTS package_enrollments_status_check;
 
 -- ====================================================================
 -- NẠP DỮ LIỆU MẪU CHUẨN (CHUẨN XÁC 100% QUAN HỆ FOREIGN KEY)
@@ -68,7 +72,7 @@ SELECT setval('trainers_id_seq', (SELECT COALESCE(MAX(id), 1) FROM trainers));
 -- --------------------------------------------------------------------
 INSERT INTO package_enrollments (id, user_id, package_id, trainer_id, total_price, start_date, end_date, status, notes, subtotal, discount_amount, payment_method, pt_sessions_total, pt_sessions_remaining) VALUES
 (1, 7, 4, 1, 4000000.00, CURRENT_DATE - INTERVAL '30 days', CURRENT_DATE + INTERVAL '335 days', 'ACTIVE', 'Hội viên VIP đóng tiền cả năm, tặng 5 buổi PT riêng', 4200000.00, 200000.00, 'VIETQR', 5, 4),
-(2, 8, 2, 2, 450000.00, CURRENT_DATE - INTERVAL '10 days', CURRENT_DATE + INTERVAL '20 days', 'ACTIVE', 'Đăng ký tập thử 1 tháng Yoga', 500000.00, 50000.00, 'COD', 0, 0)
+(2, 8, 2, 2, 450000.00, CURRENT_DATE - INTERVAL '10 days', CURRENT_DATE + INTERVAL '20 days', 'ACTIVE', 'Đăng ký tập thử 1 tháng Yoga', 500000.00, 50000.00, 'CASH', 0, 0)
 ON CONFLICT (id) DO NOTHING;
 SELECT setval('package_enrollments_id_seq', (SELECT COALESCE(MAX(id), 1) FROM package_enrollments));
 
@@ -139,10 +143,10 @@ TRUNCATE TABLE order_items, orders RESTART IDENTITY CASCADE;
 -- 7.1. NẠP ĐƠN HÀNG MẪU (ORDERS)
 -- Đơn của Hội viên VIP Cao Tuấn (user_id = 7) và Thành viên Trần Minh Đức (user_id = 8)
 -- --------------------------------------------------------------------
-INSERT INTO orders (user_id, receiver_name, phone, shipping_address, note, total_amount, order_status) VALUES
-(7, 'Cao Tuấn', '0977889900', 'Hải Phòng', 'Giao giờ hành chính, gọi trước khi giao', 2540000.00, 'PENDING'),
-(8, 'Trần Minh Đức', '0966554433', 'Đà Nẵng', NULL, 680000.00, 'CONFIRMED'),
-(7, 'Cao Tuấn', '0977889900', 'Hải Phòng', 'Đơn đã hoàn tất - đã nhận hàng', 520000.00, 'COMPLETED');
+INSERT INTO orders (user_id, receiver_name, phone, shipping_address, note, subtotal, discount_amount, total_amount, payment_method, payment_status, order_status) VALUES
+(7, 'Cao Tuấn', '0977889900', 'Hải Phòng', 'Giao giờ hành chính, gọi trước khi giao', 2540000.00, 0.00, 2540000.00, 'COD', 'UNPAID', 'PENDING'),
+(8, 'Trần Minh Đức', '0966554433', 'Đà Nẵng', NULL, 680000.00, 0.00, 680000.00, 'VIETQR', 'PAID', 'CONFIRMED'),
+(7, 'Cao Tuấn', '0977889900', 'Hải Phòng', 'Đơn đã hoàn tất - đã nhận hàng', 520000.00, 0.00, 520000.00, 'COD', 'PAID', 'COMPLETED');
 -- --------------------------------------------------------------------
 -- 7.2. NẠP CHI TIẾT ĐƠN HÀNG (ORDER_ITEMS - product_id tham chiếu bảng products ở mục 5)
 -- sub_total = unit_price * quantity
@@ -234,3 +238,14 @@ INSERT INTO system_settings (setting_key, setting_value) VALUES
 ('daily_pass_price', '50000'),
 ('auto_approve_bookings', 'true')
 ON CONFLICT (setting_key) DO NOTHING;
+
+-- --------------------------------------------------------------------
+-- 15. NẠP LỊCH SỬ THANH TOÁN MẪU (PAYMENTS)
+-- --------------------------------------------------------------------
+INSERT INTO payments (id, invoice_no, payment_code, user_id, ref_type, ref_id, amount, method, status, gateway, created_at, paid_at) VALUES
+(1, 'INV-PKG-1', 'FLPKG1', 7, 'ENROLLMENT', 1, 4000000.00, 'VIETQR', 'PAID', 'SEPAY', NOW() - INTERVAL '30 days', NOW() - INTERVAL '30 days'),
+(2, 'INV-PKG-2', 'FLPKG2', 8, 'ENROLLMENT', 2, 450000.00,  'CASH',   'PAID', 'CASH',  NOW() - INTERVAL '10 days', NOW() - INTERVAL '10 days'),
+(3, 'INV-ORD-2', 'FLORD2', 8, 'ORDER',      2, 680000.00,  'VIETQR', 'PAID', 'SEPAY', NOW() - INTERVAL '2 days',  NOW() - INTERVAL '2 days'),
+(4, 'INV-ORD-3', 'FLORD3', 7, 'ORDER',      3, 520000.00,  'COD',    'PAID', 'COD',   NOW() - INTERVAL '1 day',   NOW() - INTERVAL '1 day')
+ON CONFLICT (id) DO NOTHING;
+SELECT setval('payments_id_seq', (SELECT COALESCE(MAX(id), 1) FROM payments));
