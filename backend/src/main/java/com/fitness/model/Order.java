@@ -1,9 +1,11 @@
 package com.fitness.model;
+
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
@@ -20,7 +22,6 @@ import java.util.ArrayList;
 @Getter
 @Setter
 @NoArgsConstructor
-
 public class Order {
 
     // Minh Quang: thêm COMPLETED theo đề bài Admin Orders
@@ -34,34 +35,42 @@ public class Order {
         CANCELLED
     }
 
+    // ==== MỚI THÊM (Bước 2.2): Trạng thái thanh toán tách riêng khỏi trạng thái giao hàng ====
+    public enum PaymentStatus {
+        UNPAID,
+        PENDING,
+        PAID,
+        REFUNDED
+    }
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name ="user_id", nullable=false)
+    @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    @Column(name= "receiver_name", nullable= false, length= 100)
+    @Column(name = "receiver_name", nullable = false, length = 100)
     private String receiverName;
 
-    @Column(name= "phone", nullable= false, length= 20)
+    @Column(name = "phone", nullable = false, length = 20)
     private String phone;
 
-    @Column(name = "shipping_address", nullable= false, length= 500)
+    @Column(name = "shipping_address", nullable = false, length = 500)
     private String shippingAddress;
 
-    @Column(name="total_amount", nullable = false, precision= 12, scale = 2)
+    @Column(name = "total_amount", nullable = false, precision = 12, scale = 2)
     private BigDecimal totalAmount;
 
     @Column(columnDefinition = "TEXT")
     private String note;
 
     @Column(name = "subtotal", precision = 12, scale = 2)
-    private java.math.BigDecimal subtotal;
+    private BigDecimal subtotal;
 
     @Column(name = "discount_amount", precision = 12, scale = 2)
-    private java.math.BigDecimal discountAmount;
+    private BigDecimal discountAmount;
 
     @Column(name = "voucher_code", length = 50)
     private String voucherCode;
@@ -69,62 +78,67 @@ public class Order {
     @Column(name = "payment_method", length = 30)
     private String paymentMethod; // VIETQR, COD, CASH
 
+    // ==== MỚI THÊM (Bước 2.2): Cột trạng thái thanh toán (có default cho Hibernate ddl-auto=update) ====
     @Enumerated(EnumType.STRING)
-    @Column(nullable= false, length= 30)
+    @Column(name = "payment_status", nullable = false, length = 20)
+    @ColumnDefault("'UNPAID'")
+    private PaymentStatus paymentStatus = PaymentStatus.UNPAID;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false, length = 30)
     private OrderStatus orderStatus = OrderStatus.PENDING;
 
     @CreationTimestamp
-    @Column(name= "created_at",nullable= false)
+    @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
 
     @UpdateTimestamp
-    @Column(name= "updated_at")
+    @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
     @Setter(AccessLevel.NONE)
-    @OneToMany(mappedBy= "order", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<OrderItem>  items = new ArrayList<>();
+    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<OrderItem> items = new ArrayList<>();
 
-    public void addItem(OrderItem item){
+    public void addItem(OrderItem item) {
         item.setOrder(this);
         this.items.add(item);
     }
 
-    public void confirm(){
+    public void confirm() {
         requiredStatus(OrderStatus.PENDING);
         this.orderStatus = OrderStatus.CONFIRMED;
     }
 
-    public void ship(){
+    public void ship() {
         requiredStatus(OrderStatus.CONFIRMED);
         this.orderStatus = OrderStatus.SHIPPING;
     }
 
-    public void deliver(){
+    public void deliver() {
         requiredStatus(OrderStatus.SHIPPING);
         this.orderStatus = OrderStatus.DELIVERED;
     }
 
-    public void cancel(){
-        if (orderStatus != OrderStatus.PENDING && orderStatus != OrderStatus.CONFIRMED){
-            throw new  IllegalStateException("Cannot cancel order in status " + orderStatus);
+    public void cancel() {
+        if (orderStatus != OrderStatus.PENDING && orderStatus != OrderStatus.CONFIRMED) {
+            throw new IllegalStateException("Cannot cancel order in status " + orderStatus);
         }
         this.orderStatus = OrderStatus.CANCELLED;
         items.forEach(i -> i.getProduct().increaseStock(i.getQuantity()));
     }
 
-    public void requiredStatus(OrderStatus expected){
-        if(this.orderStatus != expected){
-            throw new  IllegalStateException("Invalid status transition from " + this.orderStatus + " to " + expected);
+    public void requiredStatus(OrderStatus expected) {
+        if (this.orderStatus != expected) {
+            throw new IllegalStateException("Invalid status transition from " + this.orderStatus + " to " + expected);
         }
     }
 
     // ==== Minh Quang: Admin duyệt đơn hoàn tất (SHIPPING/DELIVERED -> COMPLETED) theo đề bài ====
-    public void complete(){
-        if (orderStatus != OrderStatus.SHIPPING && orderStatus != OrderStatus.DELIVERED){
-            throw new  IllegalStateException("Invalid status transition from " + this.orderStatus + " to " + OrderStatus.COMPLETED);
+    public void complete() {
+        if (orderStatus != OrderStatus.SHIPPING && orderStatus != OrderStatus.DELIVERED) {
+            throw new IllegalStateException("Invalid status transition from " + this.orderStatus + " to " + OrderStatus.COMPLETED);
         }
         this.orderStatus = OrderStatus.COMPLETED;
     }
-
 }
