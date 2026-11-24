@@ -130,7 +130,9 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.PUT, "/api/admin/vouchers/**").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.DELETE, "/api/admin/vouchers/**").hasRole("ADMIN")
 
-
+                        // Public xem ảnh tĩnh đã upload
+                        .requestMatchers("/uploads/**").permitAll()
+                        
                         // 7. Tất cả các request còn lại bắt buộc có Token
                         .anyRequest().authenticated()
                 )
