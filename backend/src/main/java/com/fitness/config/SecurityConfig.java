@@ -120,8 +120,9 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/api/vouchers/**").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/vouchers/validate").permitAll()
 
-
-                        // Hóa đơn thanh toán tập trung của học viên
+                        // Webhook SePay: mở public (tự xác thực bằng Header Authorization: Apikey)
+                        .requestMatchers(HttpMethod.POST, "/api/payments/webhook/sepay").permitAll()
+                        // Các API thanh toán còn lại yêu cầu đăng nhập JWT
                         .requestMatchers("/api/payments/**").authenticated()
 
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")
