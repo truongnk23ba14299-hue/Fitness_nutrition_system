@@ -1,6 +1,7 @@
 package com.fitness.service;
 
 import com.fitness.dto.*;
+import com.fitness.Exception.ResourceNotFoundException;
 import com.fitness.model.*;
 import com.fitness.repository.EquipmentRepository;
 import com.fitness.repository.TrainerRepository;
@@ -37,7 +38,7 @@ public class WorkoutPlanService {
     public WorkoutPlanResponse getPlanById(String email, Long planId) {
         User currentUser = getUserByEmail(email);
         WorkoutPlan plan = workoutPlanRepository.findById(planId)
-                .orElseThrow(() -> new RuntimeException("Không tìm thấy giáo án với id = " + planId));
+                .orElseThrow(() -> new ResourceNotFoundException("Workout plan not found: " + planId));
 
         boolean isClientOwner = plan.getClient() != null && plan.getClient().getId().equals(currentUser.getId());
         boolean isAssignedTrainer = plan.getTrainer() != null
@@ -54,8 +55,7 @@ public class WorkoutPlanService {
     @Transactional
     public WorkoutPlanResponse createPlan(String trainerEmail, WorkoutPlanRequest request) {
         User trainerUser = getUserByEmail(trainerEmail);
-        Trainer trainer = trainerRepository.findByUser_Id(trainerUser.getId())
-                .orElseThrow(() -> new RuntimeException("Không tìm thấy hồ sơ huấn luyện viên cho tài khoản hiện tại"));
+        Trainer trainer = getOrCreateTrainerProfile(trainerUser);
 
         User client = userRepository.findById(request.getClientId())
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy học viên với id = " + request.getClientId()));
@@ -77,11 +77,10 @@ public class WorkoutPlanService {
     @Transactional
     public WorkoutPlanResponse updatePlan(String trainerEmail, Long planId, WorkoutPlanRequest request) {
         User trainerUser = getUserByEmail(trainerEmail);
-        Trainer trainer = trainerRepository.findByUser_Id(trainerUser.getId())
-                .orElseThrow(() -> new RuntimeException("Không tìm thấy hồ sơ huấn luyện viên cho tài khoản hiện tại"));
+        Trainer trainer = getOrCreateTrainerProfile(trainerUser);
 
         WorkoutPlan plan = workoutPlanRepository.findById(planId)
-                .orElseThrow(() -> new RuntimeException("Không tìm thấy giáo án với id = " + planId));
+                .orElseThrow(() -> new ResourceNotFoundException("Workout plan not found: " + planId));
 
         if (plan.getTrainer() == null || !plan.getTrainer().getId().equals(trainer.getId())) {
             throw new RuntimeException("Bạn không có quyền cập nhật giáo án này");
@@ -102,6 +101,9 @@ public class WorkoutPlanService {
         plan.setEndDate(request.getEndDate());
 
         plan.getDays().clear();
+
+        workoutPlanRepository.flush();
+
         attachDaysAndExercises(plan, request.getDays());
 
         return toResponse(workoutPlanRepository.save(plan));
@@ -154,6 +156,17 @@ public class WorkoutPlanService {
         return status.trim().toUpperCase(Locale.ROOT);
     }
 
+    private Trainer getOrCreateTrainerProfile(User trainerUser) {
+        return trainerRepository.findByUser_Id(trainerUser.getId())
+                .orElseGet(() -> trainerRepository.save(
+                        Trainer.builder()
+                                .user(trainerUser)
+                                .fullName(trainerUser.getFullName())
+                                .experienceYears(0)
+                                .specialty("General")
+                                .build()
+                ));
+    }
     private User getUserByEmail(String email) {
         return userRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy người dùng"));
