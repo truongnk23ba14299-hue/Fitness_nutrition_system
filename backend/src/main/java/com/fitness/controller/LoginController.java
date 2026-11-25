@@ -17,7 +17,6 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.util.Map;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -62,9 +61,7 @@ public class LoginController {
         GoogleUserInfo googleUserInfo = new GoogleUserInfo(
                 googleId, email, name, picture );
         // 5. Delegate account linking / creation to User Service
-        return ResponseEntity.ok(
-                userService.processGoogleUser(googleUserInfo)
-        );
+        return ResponseEntity.ok(loginService.processGoogleUser(googleUserInfo));
     }
     // Safely read optional Google claims
     private String getStringClaim(GoogleIdToken.Payload payload, String claimName) {

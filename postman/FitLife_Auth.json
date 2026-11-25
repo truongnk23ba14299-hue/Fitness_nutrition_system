@@ -1,0 +1,206 @@
+{
+  "info": {
+    "_postman_id": "fitlife-auth-viet-2026",
+    "name": "FitLife Auth - Viet VT-01 to VT-05",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8080"
+    },
+    {
+      "key": "googleNewUserIdToken",
+      "value": "PASTE_VALID_ID_TOKEN_FOR_NEW_GOOGLE_EMAIL"
+    },
+    {
+      "key": "googleExistingUserIdToken",
+      "value": "PASTE_VALID_ID_TOKEN_WHOSE_EMAIL_MATCHES_EXISTING_LOCAL_USER"
+    },
+    {
+      "key": "googleEmail",
+      "value": "viet.google.test@gmail.com"
+    },
+    {
+      "key": "accessToken",
+      "value": ""
+    }
+  ],
+  "item": [
+    {
+      "name": "POST Register LOCAL (support TC-01/TC-02)",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/api/auth/register",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"fullName\": \"Viet Test\",\n  \"email\": \"viet.local.test@gmail.com\",\n  \"password\": \"Viet@123456\",\n  \"confirmPassword\": \"Viet@123456\"\n}"
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Register: 201 Created or validation response', function () { pm.expect([201,400,409]).to.include(pm.response.code); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "POST Login LOCAL (support TC-03)",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/api/auth/login",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"email\": \"viet.local.test@gmail.com\",\n  \"password\": \"Viet@123456\"\n}"
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Login response is successful', function () { pm.response.to.have.status(200); });",
+              "const body = pm.response.json();",
+              "if (body.accessToken) pm.collectionVariables.set('accessToken', body.accessToken);"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "TC-04 Google first login - new email",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/api/auth/google",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"idToken\": \"{{googleNewUserIdToken}}\"\n}"
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Google login returns 200', function () { pm.response.to.have.status(200); });",
+              "const body = pm.response.json();",
+              "pm.test('JWT is returned', function () { pm.expect(body.accessToken).to.be.a('string').and.not.empty; });",
+              "if (body.accessToken) pm.collectionVariables.set('accessToken', body.accessToken);",
+              "pm.test('User payload exists', function () { pm.expect(body.user).to.exist; });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "TC-05 Google login with existing LOCAL email (account linking)",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/api/auth/google",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"idToken\": \"{{googleExistingUserIdToken}}\"\n}"
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Google account linking returns 200', function () { pm.response.to.have.status(200); });",
+              "const body = pm.response.json();",
+              "pm.test('JWT is returned', function () { pm.expect(body.accessToken).to.be.a('string').and.not.empty; });",
+              "if (body.accessToken) pm.collectionVariables.set('accessToken', body.accessToken);",
+              "// Verify in PostgreSQL that the existing LOCAL user id is unchanged and google_id is populated."
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "TC-06 Google user tries password login (must be 400, not 500)",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/api/auth/login",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"email\": \"{{googleEmail}}\",\n  \"password\": \"AnyPassword123\"\n}"
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Google account password login is safely rejected with 400', function () { pm.response.to.have.status(400); });",
+              "pm.test('Response is not an internal server error', function () { pm.expect(pm.response.code).to.not.equal(500); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "TC-03 Get current user (JWT check)",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{accessToken}}"
+          }
+        ],
+        "url": "{{baseUrl}}/api/auth/me"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Current user endpoint returns 200', function () { pm.response.to.have.status(200); });"
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}

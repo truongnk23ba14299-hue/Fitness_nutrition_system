@@ -82,6 +82,15 @@ public class UserService {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Không tìm thấy người dùng!"));
 
+        // Tài khoản đăng nhập bằng Google chưa có password_hash.
+        // Báo lỗi nghiệp vụ rõ ràng thay vì truyền null vào BCrypt gây HTTP 500.
+        if (user.getPassword() == null || user.getPassword().isBlank()) {
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    "Tài khoản Google chưa có mật khẩu khởi tạo. Vui lòng thiết lập mật khẩu lần đầu."
+            );
+        }
+
         if (!passwordEncoder.matches(request.currentPassword(), user.getPassword())) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Mật khẩu hiện tại không chính xác!");
         }
