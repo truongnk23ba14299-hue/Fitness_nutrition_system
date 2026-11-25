@@ -134,6 +134,8 @@ public class SecurityConfig {
                         // Public xem ảnh tĩnh đã upload
                         .requestMatchers("/uploads/**").permitAll()
                         
+                        .requestMatchers(HttpMethod.POST, "api/auth/google").permitAll()
+
                         // 7. Tất cả các request còn lại bắt buộc có Token
                         .anyRequest().authenticated()
                 )
