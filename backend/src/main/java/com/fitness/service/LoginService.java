@@ -31,9 +31,15 @@ public class LoginService {
     private final UserRepository userRepository;
     private final JwtTokenProvider jwtTokenProvider;
 
-    // Đăng nhập LOCAL: hỗ trợ email hoặc username nếu LoginRequest được nâng cấp.
+    // Đăng nhập LOCAL: chấp nhận cả Tên đăng nhập (username) lẫn Email trên cùng một ô nhập liệu.
     public LoginResponse login(LoginRequest request) {
-        String identifier = request.getEmail() == null ? "" : request.getEmail().trim();
+        String identifier = request.getIdentifier() == null ? "" : request.getIdentifier().trim();
+        if (identifier.isEmpty()) {
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    "Vui lòng nhập tên đăng nhập hoặc email"
+            );
+        }
 
         // Chặn tài khoản Google trước khi Spring Security/BCrypt xử lý password null.
         User found = userRepository.findByEmailIgnoreCaseOrUsernameIgnoreCase(identifier, identifier)
@@ -53,7 +59,7 @@ public class LoginService {
         } catch (org.springframework.security.authentication.LockedException e) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Tài khoản của bạn đã bị khóa. Vui lòng liên hệ quản trị viên!");
         } catch (BadCredentialsException | UsernameNotFoundException e) {
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Email/username hoặc mật khẩu không chính xác");
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Tên đăng nhập/Email hoặc mật khẩu không chính xác");
         } catch (AuthenticationException e) {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Đăng nhập thất bại");
         }
