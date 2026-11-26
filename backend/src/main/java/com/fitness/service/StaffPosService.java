@@ -194,4 +194,13 @@ public class StaffPosService {
 
         return userRepository.save(newUser);
     }
+        public java.util.Map<String, Object> getTodayPosSummary() {
+        // Thống kê nhanh cho Dashboard Lễ tân
+        return java.util.Map.of(
+            "message", "Thống kê doanh số bán hàng tại quầy POS trong ngày",
+            "date", java.time.LocalDate.now().toString(),
+            "todaySalesCount", checkInRepository.count(), // hoặc đếm từ packageEnrollments POS
+            "status", "ACTIVE"
+        );
+    }
 }

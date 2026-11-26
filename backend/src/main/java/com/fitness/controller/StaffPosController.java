@@ -33,4 +33,9 @@ public class StaffPosController {
         PosSaleResponse response = staffPosService.processPosSale(staffEmail, request);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
+
+    @GetMapping("/sales/summary")
+    public ResponseEntity<?> getTodayPosSummary() {
+        return ResponseEntity.ok(staffPosService.getTodayPosSummary());
+    }
 }
