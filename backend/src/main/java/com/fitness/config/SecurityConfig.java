@@ -101,16 +101,14 @@ public class SecurityConfig {
                         // ==========================================================
                         // 5. NỘI DUNG CẦN ĐĂNG NHẬP CỦA HỌC VIÊN (PROTECTED)
                         // ==========================================================
-                        .requestMatchers(HttpMethod.GET, "/api/packages/{id}").authenticated()
-                        .requestMatchers(HttpMethod.GET, "/api/equipments/{id}").authenticated()
                         .requestMatchers("/api/package-enrollments/**").authenticated()
                         .requestMatchers("/api/bookings/**").authenticated()
 
                         // ==========================================================
                         // 6. PUBLIC PREVIEW (Khách vãng lai xem trang chủ)
                         // ==========================================================
-                        .requestMatchers(HttpMethod.GET, "/api/packages").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api/equipments").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/packages/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/equipments/**").permitAll()
                         // Public danh sách & chi tiết sản phẩm (/api/product/{id} và /api/products)
                         .requestMatchers(HttpMethod.GET, "/api/products/**", "/api/product/**").permitAll()
                         // Public thông tin giới thiệu các PT ngoài trang chủ (/api/trainers số nhiều)
