@@ -40,4 +40,20 @@ public class EquipmentController {
         EquipmentDetailResponse response = equipmentService.addEquipment(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
+
+    // 4. PUT /api/equipments/{id}: Cập nhật thông tin máy tập
+    @PutMapping("/{id}")
+    public ResponseEntity<EquipmentDetailResponse> updateEquipment(
+            @PathVariable Long id,
+            @Valid @RequestBody EquipmentRequest request) {
+        EquipmentDetailResponse response = equipmentService.updateEquipment(id, request);
+        return ResponseEntity.ok(response);
+    }
+
+    // 5. DELETE /api/equipments/{id}: Xóa máy tập khỏi phòng gym
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteEquipment(@PathVariable Long id) {
+        equipmentService.deleteEquipment(id);
+        return ResponseEntity.noContent().build();
+    }
 }

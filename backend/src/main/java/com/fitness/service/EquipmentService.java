@@ -61,6 +61,7 @@ public class EquipmentService {
                 .name(request.name().trim())
                 .brand(request.brand())
                 .imageUrl(request.imageUrl())
+                .videoUrl(request.videoUrl())
                 .workoutGuide(request.workoutGuide().trim())
                 .targetMuscle(request.targetMuscle().trim())
                 .build();
@@ -75,6 +76,40 @@ public class EquipmentService {
                 saved.getWorkoutGuide(),
                 saved.getTargetMuscle(),
                 saved.getCreatedAt()
+        );
+    }
+    // API sửa máy tập
+    @Transactional
+    public EquipmentDetailResponse updateEquipment(Long id, EquipmentRequest request) {
+        Equipment equipment = equipmentRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy thiết bị với ID: " + id));
+        equipment.setName(request.name().trim());
+        equipment.setBrand(request.brand());
+        equipment.setImageUrl(request.imageUrl());
+        equipment.setVideoUrl(request.videoUrl());
+        equipment.setWorkoutGuide(request.workoutGuide().trim());
+        equipment.setTargetMuscle(request.targetMuscle().trim());
+        Equipment updated = equipmentRepository.save(equipment);
+        return mapToDetailResponse(updated);
+    }
+
+    // API Xóa máy tập
+    @Transactional
+    public void deleteEquipment(Long id) {
+        if (!equipmentRepository.existsById(id)) {
+            throw new IllegalArgumentException("Không tìm thấy thiết bị với ID: " + id);
+        }
+        equipmentRepository.deleteById(id);
+    }
+    private EquipmentDetailResponse mapToDetailResponse(Equipment eq) {
+        return new EquipmentDetailResponse(
+                eq.getId(),
+                eq.getName(),
+                eq.getBrand(),
+                eq.getImageUrl(),
+                eq.getWorkoutGuide(),
+                eq.getTargetMuscle(),
+                eq.getCreatedAt()
         );
     }
 }
