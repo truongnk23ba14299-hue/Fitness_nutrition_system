@@ -22,6 +22,11 @@ RESTART IDENTITY CASCADE;
 
 -- Gỡ CHECK constraint enum cũ (nếu có) để cho phép giá trị mới PENDING_PAYMENT
 ALTER TABLE package_enrollments DROP CONSTRAINT IF EXISTS package_enrollments_status_check;
+-- Gỡ CHECK constraint enum cũ (nếu có) để cho phép giá trị mới PENDING_PAYMENT
+ALTER TABLE package_enrollments DROP CONSTRAINT IF EXISTS package_enrollments_status_check;
+
+-- Cho phép password_hash NULL với tài khoản đăng nhập bằng Google
+ALTER TABLE users ALTER COLUMN password_hash DROP NOT NULL;
 
 -- ====================================================================
 -- NẠP DỮ LIỆU MẪU CHUẨN (CHUẨN XÁC 100% QUAN HỆ FOREIGN KEY)
@@ -248,8 +253,7 @@ INSERT INTO payments (id, invoice_no, payment_code, user_id, ref_type, ref_id, a
 (3, 'INV-ORD-2', 'FLORD2', 8, 'ORDER',      2, 680000.00,  'VIETQR', 'PAID', 'SEPAY', NOW() - INTERVAL '2 days',  NOW() - INTERVAL '2 days'),
 (4, 'INV-ORD-3', 'FLORD3', 7, 'ORDER',      3, 520000.00,  'COD',    'PAID', 'COD',   NOW() - INTERVAL '1 day',   NOW() - INTERVAL '1 day')
 ON CONFLICT (id) DO NOTHING;
-SELECT setval('payments_id_seq', (SELECT COALESCE(MAX(id), 1) FROM payments));
-=======
+SELECT setval(pg_get_serial_sequence('payments', 'id'), (SELECT COALESCE(MAX(id), 1) FROM payments));
 
 -- --------------------------------------------------------------------
 -- 16. NẠP thông báo mẫu (Notification)
