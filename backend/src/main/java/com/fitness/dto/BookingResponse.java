@@ -13,7 +13,9 @@ public record BookingResponse(
         String trainerName,
         LocalDateTime bookingDateTime,
         String note,
-        String status
+        String status,
+        String trainerNote,
+        LocalDateTime completedAt
 ) {
     public static BookingResponse fromEntity(Booking booking) {
         if (booking == null) {
@@ -36,7 +38,9 @@ public record BookingResponse(
                 trainerName,
                 booking.getBookingDateTime(),
                 booking.getNote(),
-                booking.getStatus()
+                booking.getStatus(),
+                booking.getTrainerNote(),
+                booking.getCompletedAt()
         );
     }
 }

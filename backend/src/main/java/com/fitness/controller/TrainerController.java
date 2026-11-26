@@ -3,6 +3,8 @@ package com.fitness.controller;
 import com.fitness.dto.TrainerResponse;
 import com.fitness.dto.TrainerScheduleResponse;
 import com.fitness.service.TrainerService;
+import com.fitness.service.TrainerBookingService;
+import com.fitness.dto.ReviewResponse;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -16,9 +18,11 @@ import java.util.List;
 public class TrainerController {
 
     private final TrainerService trainerService;
+    private final TrainerBookingService trainerBookingService;
 
-    public TrainerController(TrainerService trainerService) {
+    public TrainerController(TrainerService trainerService, TrainerBookingService trainerBookingService) {
         this.trainerService = trainerService;
+        this.trainerBookingService = trainerBookingService;
     }
 
     /**
@@ -49,6 +53,15 @@ public class TrainerController {
             return ResponseEntity.notFound().build();
         }
         return ResponseEntity.ok(trainer);
+    }
+
+    /**
+     * API Endpoint: GET /api/trainers/{id}/reviews
+     * Lấy danh sách đánh giá của một huấn luyện viên.
+     */
+    @GetMapping("/{id}/reviews")
+    public ResponseEntity<List<ReviewResponse>> getTrainerReviews(@PathVariable Long id) {
+        return ResponseEntity.ok(trainerBookingService.getTrainerReviews(id));
     }
 
     /**

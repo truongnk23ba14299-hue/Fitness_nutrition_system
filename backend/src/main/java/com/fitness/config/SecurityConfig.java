@@ -125,6 +125,9 @@ public class SecurityConfig {
                         // Các API thanh toán còn lại yêu cầu đăng nhập JWT
                         .requestMatchers("/api/payments/**").authenticated()
 
+                        // Booking management: ADMIN và STAFF đều được phép truy cập.
+                        // Đặt trước matcher /api/admin/** để không bị rule ADMIN tổng quát chặn.
+                        .requestMatchers("/api/admin/bookings/**").hasAnyRole("ADMIN", "STAFF")
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.GET, "/api/admin/vouchers").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.POST, "/api/admin/vouchers").hasRole("ADMIN")
