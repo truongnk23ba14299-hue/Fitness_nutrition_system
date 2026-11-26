@@ -110,7 +110,7 @@ public class User implements UserDetails {
 
     @Override
     public boolean isAccountNonLocked() {
-        return true;
+        return !"LOCKED".equalsIgnoreCase(this.status) && !"BANNED".equalsIgnoreCase(this.status);
     }
 
     @Override

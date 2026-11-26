@@ -50,6 +50,8 @@ public class LoginService {
             authentication = authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(identifier, request.getPassword())
             );
+        } catch (org.springframework.security.authentication.LockedException e) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Tài khoản của bạn đã bị khóa. Vui lòng liên hệ quản trị viên!");
         } catch (BadCredentialsException | UsernameNotFoundException e) {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Email/username hoặc mật khẩu không chính xác");
         } catch (AuthenticationException e) {
