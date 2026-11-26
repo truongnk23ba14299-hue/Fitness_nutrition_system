@@ -15,9 +15,11 @@ import java.util.List;
 public class UserResponse {
 
     private Long id;
+    private String username;
     private String email;
     private String fullName;
     private String avatarUrl;
+    private String authProvider;
     private List<String> roles;
 
     public static UserResponse fromEntity(User user) {
@@ -29,9 +31,11 @@ public class UserResponse {
 
         return UserResponse.builder()
                 .id(user.getId())
+                .username(user.getActualUsername())
                 .email(user.getEmail())
                 .fullName(user.getFullName())
                 .avatarUrl(user.getAvatarUrl())
+                .authProvider(user.getAuthProvider())
                 .roles(roleNames)
                 .build();
     }
