@@ -10,9 +10,27 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class LoginRequest {
 
-    @NotBlank(message = "Email không được để trống")
+    /**
+     * Ô nhập liệu hợp nhất: chấp nhận cả Tên đăng nhập (username) lẫn Email.
+     */
+    private String identifier;
+
+    /**
+     * Giữ lại trường email cũ để tương thích 100% collection Postman / client cũ.
+     */
     private String email;
 
     @NotBlank(message = "Mật khẩu không được để trống")
     private String password;
+
+    /**
+     * Luôn trả về một giá trị thống nhất cho tầng Service:
+     * ưu tiên identifier mới, nếu client cũ chỉ gửi email thì lấy email.
+     */
+    public String getIdentifier() {
+        if (identifier != null && !identifier.isBlank()) {
+            return identifier;
+        }
+        return email;
+    }
 }
