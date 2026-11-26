@@ -133,6 +133,9 @@ public class SecurityConfig {
 
                         // Public xem ảnh tĩnh đã upload
                         .requestMatchers("/uploads/**").permitAll()
+
+                        // Public form tư vấn
+                        .requestMatchers(HttpMethod.POST, "/api/leads").permitAll()
                         
                         .requestMatchers(HttpMethod.POST, "api/auth/google").permitAll()
 
