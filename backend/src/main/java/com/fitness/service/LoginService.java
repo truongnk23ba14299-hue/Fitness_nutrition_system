@@ -9,9 +9,7 @@ import com.fitness.model.User;
 import com.fitness.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.authentication.*;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -56,10 +54,11 @@ public class LoginService {
             authentication = authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(identifier, request.getPassword())
             );
-        } catch (org.springframework.security.authentication.LockedException e) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Tài khoản của bạn đã bị khóa. Vui lòng liên hệ quản trị viên!");
+
         } catch (BadCredentialsException | UsernameNotFoundException e) {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Tên đăng nhập/Email hoặc mật khẩu không chính xác");
+        } catch (LockedException | DisabledException e) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Tài khoản của bạn đã bị khóa. Vui lòng liên hệ quản trị viên!");
         } catch (AuthenticationException e) {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Đăng nhập thất bại");
         }
@@ -70,10 +69,6 @@ public class LoginService {
         return new LoginResponse(jwt, "Bearer", UserResponse.fromEntity(user));
     }
 
-    /**
-     * Xử lý tài khoản sau khi GoogleAuthService đã xác minh ID token.
-     * Không tạo user trùng email; giữ nguyên tài khoản LOCAL và dữ liệu nghiệp vụ.
-     */
     @Transactional
     public LoginResponse processGoogleUser(GoogleUserInfo googleInfo) {
         if (googleInfo == null || isBlank(googleInfo.googleId()) || isBlank(googleInfo.email())) {
@@ -138,7 +133,11 @@ public class LoginService {
         Authentication authentication = new UsernamePasswordAuthenticationToken(
                 user, null, user.getAuthorities()
         );
+
         SecurityContextHolder.getContext().setAuthentication(authentication);
+        if (!user.isAccountNonLocked() || !user.isEnabled()) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Tài khoản của bạn đã bị khóa. Vui lòng liên hệ quản trị viên!");
+        }
         String jwt = jwtTokenProvider.generateToken(authentication);
         return new LoginResponse(jwt, "Bearer", UserResponse.fromEntity(user));
     }
